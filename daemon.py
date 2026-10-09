@@ -9,7 +9,7 @@ import ctypes
 import os
 import struct
 import sys
-
+import risk
 import db
 import writer
 
@@ -72,13 +72,25 @@ def name_of_process(pid):
 
 def decide(policies, path):
     action, note = db.check(policies, path)
+
+    # Keep the history up to date whatever the rules say, so the score
+    # sees everything the agent touched.
+    risk.record(path)
+
+    # A hard rule wins outright. We do not want a well-behaved agent to
+    # earn its way into credentials by looking calm first.
     if action == "block":
         return FAN_DENY, note
+
+    points, why = risk.score(path, action == "block")
+
+    if risk.is_risky(points):
+        return FAN_DENY, "risk %d: %s" % (points, why)
+
     if action == "allow":
         return FAN_ALLOW, note
-    # No rule mentions this path. Later the risk score decides here.
-    return FAN_ALLOW, "no rule"
 
+    return FAN_ALLOW, "no rule"
 
 def answer(fan_fd, event_fd, verdict):
     os.write(fan_fd, struct.pack("<iI", event_fd, verdict))
