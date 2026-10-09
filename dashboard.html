@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis</title>
+<style>
+  :root {
+    --bg:      #16181d;
+    --panel:   #1c1f26;
+    --line:    #2a2f38;
+    --text:    #dfe3e8;
+    --dim:     #79828f;
+    --allow:   #4ea882;
+    --block:   #e0575e;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "DejaVu Sans Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* ---- header ---------------------------------------------------- */
+  header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: 0.2px; }
+  .watching { color: var(--dim); font-size: 12px; }
+  .live {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 7px;
+    color: var(--dim); font-size: 12px;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--allow);
+  }
+  .dot.stale { background: var(--block); }
+
+  /* ---- tally ------------------------------------------------------ */
+  .tally { display: flex; align-items: flex-end; gap: 34px; margin: 26px 0 8px; }
+  .stat .n { font-size: 34px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat .k { font-size: 11px; color: var(--dim); margin-top: 5px; }
+  .stat.allow .n { color: var(--allow); }
+  .stat.block .n { color: var(--block); }
+
+  .ratio {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--block);
+    display: flex;
+    margin-bottom: 6px;
+  }
+  .ratio > i { display: block; background: var(--allow); transition: width .4s ease; }
+
+  /* ---- controls --------------------------------------------------- */
+  .controls { display: flex; gap: 8px; margin: 22px 0 10px; }
+  button {
+    font: inherit;
+    font-size: 12px;
+    color: var(--dim);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 5px 11px;
+    cursor: pointer;
+  }
+  button:hover { color: var(--text); }
+  button[aria-pressed="true"] { color: var(--text); border-color: #48505c; background: var(--panel); }
+  button:focus-visible { outline: 2px solid var(--allow); outline-offset: 2px; }
+
+  /* ---- feed ------------------------------------------------------- */
+  .feed { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+
+  .head, .row {
+    display: grid;
+    grid-template-columns: 74px 92px 1fr 200px;
+    gap: 16px;
+    padding: 9px 16px 9px 13px;
+    align-items: baseline;
+  }
+  .head {
+    color: var(--dim);
+    font-size: 11px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    padding-left: 16px;
+  }
+
+  .row { border-bottom: 1px solid #22262e; border-left: 3px solid transparent; }
+  .row:last-child { border-bottom: none; }
+  .row.block { border-left-color: var(--block); background: rgba(224, 87, 94, .06); }
+  .row.allow { border-left-color: #2f3a44; }
+
+  .t { color: var(--dim); font-variant-numeric: tabular-nums; }
+  .proc { color: var(--dim); }
+  .path { overflow-wrap: anywhere; }
+  .path b { color: #fff; font-weight: 600; }
+  .why { color: var(--dim); font-size: 12px; }
+  .row.block .why { color: var(--block); }
+
+  /* one flash when a decision is new, so you can see what just changed */
+  @keyframes land { from { background: rgba(255,255,255,.09); } }
+  .row.fresh { animation: land .7s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .row.fresh { animation: none; } }
+
+  .empty { padding: 34px 16px; color: var(--dim); text-align: center; }
+
+  @media (max-width: 720px) {
+    .head { display: none; }
+    .row { grid-template-columns: 1fr; gap: 3px; padding: 11px 14px; }
+    .tally { flex-wrap: wrap; gap: 22px; }
+    .ratio { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Aegis</h1>
+    <span class="watching">file access decisions</span>
+    <span class="live"><span class="dot" id="dot"></span><span id="pulse">connecting</span></span>
+  </header>
+
+  <div class="tally">
+    <div class="stat allow"><div class="n" id="allow">0</div><div class="k">allowed</div></div>
+    <div class="stat block"><div class="n" id="block">0</div><div class="k">blocked</div></div>
+    <div class="ratio"><i id="bar" style="width:100%"></i></div>
+  </div>
+
+  <div class="controls">
+    <button id="f-all"   aria-pressed="true">Everything</button>
+    <button id="f-block" aria-pressed="false">Blocked only</button>
+    <button id="hold"    aria-pressed="false">Pause</button>
+  </div>
+
+  <div class="feed">
+    <div class="head">
+      <span>Time</span><span>Process</span><span>File</span><span>Reason</span>
+    </div>
+    <div id="rows"></div>
+  </div>
+
+</div>
+
+<script>
+// The page only reads. Every decision here was already made by the daemon
+// and written to PostgreSQL. We ask the API for fresh numbers once a second.
+
+let filter = "all";
+let paused = false;
+let seen = new Set();      // paths+times we have already drawn, to flash new ones
+let firstLoad = true;
+
+function ago(hhmmss) {
+  // Server sends clock time. "14s ago" reads better than a timestamp when
+  // you are watching something happen.
+  const [h, m, s] = hhmmss.split(":").map(Number);
+  const now = new Date();
+  const then = new Date(now);
+  then.setHours(h, m, s, 0);
+  let diff = Math.round((now - then) / 1000);
+  if (diff < 0) diff += 86400;          // rolled past midnight
+  if (diff < 60) return diff + "s ago";
+  if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+  return hhmmss;
+}
+
+function shortPath(p) {
+  // Keep the last two segments bright, dim the rest. The filename and its
+  // folder are what you are actually reading.
+  const parts = p.split("/");
+  if (parts.length < 3) return p;
+  const tail = parts.slice(-2).join("/");
+  const head = parts.slice(0, -2).join("/") + "/";
+  return head + "<b>" + tail + "</b>";
+}
+
+function setFilter(name) {
+  filter = name;
+  document.getElementById("f-all").setAttribute("aria-pressed", name === "all");
+  document.getElementById("f-block").setAttribute("aria-pressed", name === "block");
+  draw();
+}
+
+let latest = [];
+
+function draw() {
+  const box = document.getElementById("rows");
+  const list = filter === "block"
+    ? latest.filter(r => r.verdict === "block")
+    : latest;
+
+  if (list.length === 0) {
+    box.innerHTML = '<div class="empty">' +
+      (filter === "block" ? "Nothing has been blocked yet."
+                          : "No activity yet. Start the daemon and open a file.") +
+      '</div>';
+    return;
+  }
+
+  box.innerHTML = "";
+  for (const r of list) {
+    const key = r.time + r.path + r.verdict;
+    const div = document.createElement("div");
+    div.className = "row " + r.verdict + (!firstLoad && !seen.has(key) ? " fresh" : "");
+    div.innerHTML =
+      '<span class="t">'    + ago(r.time)          + '</span>' +
+      '<span class="proc">' + (r.process || "?")   + '</span>' +
+      '<span class="path">' + shortPath(r.path)    + '</span>' +
+      '<span class="why">'  + (r.reason || "")     + '</span>';
+    box.appendChild(div);
+    seen.add(key);
+  }
+  firstLoad = false;
+}
+
+async function refresh() {
+  if (paused) return;
+  try {
+    const counts = await (await fetch("/counts")).json();
+    const a = counts.allow || 0, b = counts.block || 0;
+    document.getElementById("allow").textContent = a;
+    document.getElementById("block").textContent = b;
+    document.getElementById("bar").style.width =
+      (a + b === 0 ? 100 : (a / (a + b)) * 100) + "%";
+
+    latest = await (await fetch("/recent")).json();
+    draw();
+
+    document.getElementById("dot").classList.remove("stale");
+    document.getElementById("pulse").textContent = "live";
+  } catch (e) {
+    document.getElementById("dot").classList.add("stale");
+    document.getElementById("pulse").textContent = "no connection";
+  }
+}
+
+document.getElementById("f-all").onclick   = () => setFilter("all");
+document.getElementById("f-block").onclick = () => setFilter("block");
+document.getElementById("hold").onclick = (e) => {
+  paused = !paused;
+  e.target.setAttribute("aria-pressed", paused);
+  e.target.textContent = paused ? "Resume" : "Pause";
+};
+
+refresh();
+setInterval(refresh, 1000);
+</script>
+</body>
+</html>
