@@ -119,7 +119,7 @@ problem. Not changed in this PR; suggested as a follow-up.
 ## Task 6: LISTEN/NOTIFY prototype (`task6_listen_notify.txt`)
 
 A statement-level trigger on `policies` calls
-`pg_notify('policies_changed', TG_OP)`; `sql/listen_demo.py` (37 lines)
+`pg_notify('policies_changed', TG_OP)`; `sql/listen_demo.py` (34 lines)
 listens and reloads. Command: `bash results/db/scripts/run_task6.sh`.
 Rolled-back insert: no notification. Committed INSERT: `INSERT`, 6 rules.
 Three UPDATEs in one transaction: one `UPDATE` notification. DELETE:
