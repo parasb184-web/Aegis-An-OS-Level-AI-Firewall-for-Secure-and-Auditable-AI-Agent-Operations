@@ -18,7 +18,13 @@ def connect():
 def load_policies():
     conn = connect()
     cur = conn.cursor()
-    cur.execute("SELECT path_pattern, sensitivity, action, note FROM policies")
+    # check() returns the first match, so the order here is the rule
+    # priority. Without ORDER BY, SQL returns rows in whatever order they
+    # sit on disk, and an UPDATE can move a row. Blocks come first so a
+    # block always beats an allow (a .env inside the project stays
+    # blocked); id breaks ties so the order never changes between runs.
+    cur.execute("SELECT path_pattern, sensitivity, action, note FROM policies "
+                "ORDER BY CASE action WHEN 'block' THEN 0 ELSE 1 END, id")
     rows = cur.fetchall()
     cur.close()
     conn.close()
