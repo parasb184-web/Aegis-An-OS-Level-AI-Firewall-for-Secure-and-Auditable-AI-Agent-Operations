@@ -27,7 +27,7 @@ def record(path):
         history.pop(0)
 
 
-def score(path, path_is_sensitive):
+def score():
     # Called after record(), so the current open is already counted.
     files = len(history)
     folders = len(set(folder for when, folder in history))
@@ -43,10 +43,6 @@ def score(path, path_is_sensitive):
         points = points + 30
         reasons.append("%d folders" % folders)
 
-    if path_is_sensitive:
-        points = points + 50
-        reasons.append("sensitive file")
-
     return points, ", ".join(reasons)
 
 
@@ -59,7 +55,7 @@ if __name__ == "__main__":
     for i in range(30):
         p = "/home/test/notes/file%d.txt" % i
         record(p)
-        points, why = score(p, False)
+        points, why = score()
         if i % 10 == 0 or is_risky(points):
             print("file %-3d score %-4d %s" % (i, points, why))
             if is_risky(points):

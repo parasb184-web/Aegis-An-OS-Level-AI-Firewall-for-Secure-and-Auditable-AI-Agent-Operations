@@ -82,7 +82,7 @@ def decide(policies, path):
     if action == "block":
         return FAN_DENY, note
 
-    points, why = risk.score(path, action == "block")
+    points, why = risk.score()
 
     if risk.is_risky(points):
         return FAN_DENY, "risk %d: %s" % (points, why)
