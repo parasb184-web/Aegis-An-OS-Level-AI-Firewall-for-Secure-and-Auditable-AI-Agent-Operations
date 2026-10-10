@@ -1,0 +1,19 @@
+$ psql -f sql/cleanup.sql
+BEGIN
+DELETE 0
+ id |   path_pattern    | sensitivity | action 
+----+-------------------+-------------+--------
+  1 | /home/%/.ssh/%    | high        | block
+  2 | /home/%/.aws/%    | high        | block
+  3 | %/.env            | high        | block
+  4 | /home/%/.gnupg/%  | high        | block
+  5 | /home/%/project/% | low         | allow
+(5 rows)
+
+COMMIT
+
+$ python3 db.py
+loaded 5 rules
+/home/acerparas/.ssh/id_rsa -> ('block', 'SSH private keys')
+/home/acerparas/project/main.py -> ('allow', 'the agent workspace')
+/home/acerparas/notes.txt -> (None, None)
