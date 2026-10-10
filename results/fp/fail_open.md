@@ -33,7 +33,7 @@ Earlier attempts are not used as the labeled `kill -9` result: `sudo kill -9 197
 | 2026-10-10 09:44:01 | 1 | `FAILED` — Operation not permitted |
 | 2026-10-10 09:44:37 | 36 | last `FAILED` |
 | 2026-10-10 09:44:38 | 37 | first `OPENED` (8 bytes) |
-| 2026-10-10 09:44:55 | 54 | last recorded `OPENED` |
+| 2026-10-10 09:44:55 | 54 | still `OPENED` (loop left running; later lines continue `OPENED`) |
 
 Same fail-open as `kill -9`: one second after the daemon left, the key opened.
 
