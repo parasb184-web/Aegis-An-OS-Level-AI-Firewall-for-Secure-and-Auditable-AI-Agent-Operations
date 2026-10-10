@@ -1,0 +1,525 @@
+
+==================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_arguments.py ___________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_arguments.py'
+_____________________ ERROR collecting tests/test_basic.py _____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_basic.py'
+_____________________ ERROR collecting tests/test_chain.py _____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_chain.py'
+______________ ERROR collecting tests/test_command_decorators.py _______________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_command_decorators.py'
+___________________ ERROR collecting tests/test_commands.py ____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_commands.py'
+____________________ ERROR collecting tests/test_compat.py _____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_compat.py'
+____________________ ERROR collecting tests/test_context.py ____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_context.py'
+________________ ERROR collecting tests/test_custom_classes.py _________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_custom_classes.py'
+___________________ ERROR collecting tests/test_defaults.py ____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_defaults.py'
+__________________ ERROR collecting tests/test_formatting.py ___________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_formatting.py'
+____________________ ERROR collecting tests/test_imports.py ____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_imports.py'
+___________________ ERROR collecting tests/test_info_dict.py ___________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_info_dict.py'
+_________________ ERROR collecting tests/test_normalization.py _________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_normalization.py'
+____________________ ERROR collecting tests/test_options.py ____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_options.py'
+____________________ ERROR collecting tests/test_parser.py _____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_parser.py'
+_______________ ERROR collecting tests/test_shell_completion.py ________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_shell_completion.py'
+____________________ ERROR collecting tests/test_termui.py _____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_termui.py'
+____________________ ERROR collecting tests/test_testing.py ____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_testing.py'
+_____________________ ERROR collecting tests/test_types.py _____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_types.py'
+_____________________ ERROR collecting tests/test_utils.py _____________________
+/usr/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1406: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1371: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1342: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:938: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:188: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:355: in _rewrite_test
+    source = fn.read_bytes()
+             ^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:778: in read_bytes
+    with self.open(mode='rb', buffering=0) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/pathlib/__init__.py:772: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   PermissionError: [Errno 1] Operation not permitted: '/home/mansi/demo/project/realrepo/tests/test_utils.py'
+=========================== short test summary info ============================
+ERROR tests/test_arguments.py - PermissionError: [Errno 1] Operation not perm...
+ERROR tests/test_basic.py - PermissionError: [Errno 1] Operation not permitte...
+ERROR tests/test_chain.py - PermissionError: [Errno 1] Operation not permitte...
+ERROR tests/test_command_decorators.py - PermissionError: [Errno 1] Operation...
+ERROR tests/test_commands.py - PermissionError: [Errno 1] Operation not permi...
+ERROR tests/test_compat.py - PermissionError: [Errno 1] Operation not permitt...
+ERROR tests/test_context.py - PermissionError: [Errno 1] Operation not permit...
+ERROR tests/test_custom_classes.py - PermissionError: [Errno 1] Operation not...
+ERROR tests/test_defaults.py - PermissionError: [Errno 1] Operation not permi...
+ERROR tests/test_formatting.py - PermissionError: [Errno 1] Operation not per...
+ERROR tests/test_imports.py - PermissionError: [Errno 1] Operation not permit...
+ERROR tests/test_info_dict.py - PermissionError: [Errno 1] Operation not perm...
+ERROR tests/test_normalization.py - PermissionError: [Errno 1] Operation not ...
+ERROR tests/test_options.py - PermissionError: [Errno 1] Operation not permit...
+ERROR tests/test_parser.py - PermissionError: [Errno 1] Operation not permitt...
+ERROR tests/test_shell_completion.py - PermissionError: [Errno 1] Operation n...
+ERROR tests/test_termui.py - PermissionError: [Errno 1] Operation not permitt...
+ERROR tests/test_testing.py - PermissionError: [Errno 1] Operation not permit...
+ERROR tests/test_types.py - PermissionError: [Errno 1] Operation not permitte...
+ERROR tests/test_utils.py - PermissionError: [Errno 1] Operation not permitte...
+!!!!!!!!!!!!!!!!!!! Interrupted: 20 errors during collection !!!!!!!!!!!!!!!!!!!
+no tests collected, 20 errors in 0.94s

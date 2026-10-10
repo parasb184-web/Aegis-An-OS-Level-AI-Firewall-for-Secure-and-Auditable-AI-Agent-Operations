@@ -1,0 +1,8 @@
+label: before
+mode: nowait
+repo: https://github.com/pallets/click.git @ 8.1.7 ()
+host: 6.18.33.2-microsoft-standard-WSL2
+daemon: 1971 sudo python3 -u daemon.py /home/mansi/demo;1974 sudo python3 -u daemon.py /home/mansi/demo;1975 python3 -u daemon.py /home/mansi/demo;
+pytest: pytest 9.0.2
+db_start: 2026-10-10 09:21:35.865584
+db_end: 2026-10-10 09:21:43.839044
