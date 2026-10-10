@@ -153,6 +153,7 @@ def sweep(path):
     for pid in list(roots):
         if not alive(pid):
             roots.discard(pid)
+            risk.forget(pid)
 
     # Drop cached answers for pids that are gone, so a pid the kernel hands
     # out again does not inherit the answer we gave the previous owner.
@@ -182,19 +183,19 @@ def supervising_root(pid):
     return answer
 
 
-def decide(policies, path):
+def decide(policies, path, root):
     action, note = db.check(policies, path)
 
     # Keep the history up to date whatever the rules say, so the score
     # sees everything the agent touched.
-    risk.record(path)
+    risk.record(root, path)
 
     # A hard rule wins outright. We do not want a well-behaved agent to
     # earn its way into credentials by looking calm first.
     if action == "block":
         return FAN_DENY, note
 
-    points, why = risk.score()
+    points, why = risk.score(root)
 
     if risk.is_risky(points):
         return FAN_DENY, "risk %d: %s" % (points, why)
@@ -271,7 +272,7 @@ def main():
                 # still log it so we can show what we chose not to touch.
                 verdict, reason = FAN_ALLOW, "not supervised"
             else:
-                verdict, reason = decide(policies, path)
+                verdict, reason = decide(policies, path, root)
 
             name = name_of_process(pid)
 
