@@ -193,17 +193,22 @@ def decide(policies, path, root):
     # A hard rule wins outright. We do not want a well-behaved agent to
     # earn its way into credentials by looking calm first.
     if action == "block":
-        return FAN_DENY, note
+        return FAN_DENY, "block", note
 
     points, why = risk.score(root)
 
     if risk.is_risky(points):
-        return FAN_DENY, "risk %d: %s" % (points, why)
+        return FAN_DENY, "block", "risk %d: %s" % (points, why)
+
+    # Medium risk still opens the file. We only want it on the record, so a
+    # reviewer can see the agent drifting before anything gets refused.
+    if risk.is_warning(points):
+        return FAN_ALLOW, "warn", "risk %d: %s" % (points, why)
 
     if action == "allow":
-        return FAN_ALLOW, note
+        return FAN_ALLOW, "allow", note
 
-    return FAN_ALLOW, "no rule"
+    return FAN_ALLOW, "allow", "no rule"
 
 def answer(fan_fd, event_fd, verdict):
     os.write(fan_fd, struct.pack("<iI", event_fd, verdict))
@@ -270,24 +275,21 @@ def main():
             if root is None:
                 # Not part of the agent tree. We stay out of its way, but we
                 # still log it so we can show what we chose not to touch.
-                verdict, reason = FAN_ALLOW, "not supervised"
+                verdict, label, reason = FAN_ALLOW, "allow", "not supervised"
             else:
-                verdict, reason = decide(policies, path, root)
+                verdict, label, reason = decide(policies, path, root)
 
             name = name_of_process(pid)
 
             print("%-8s pid=%-7d %s  ->  %s (%s)" % (
-                name, pid, path,
-                "ALLOW" if verdict == FAN_ALLOW else "DENY", reason))
+                name, pid, path, label.upper(), reason))
 
             # Answer the kernel FIRST so the paused process gets going again.
             answer(fan_fd, event_fd, verdict)
             os.close(event_fd)
 
             # Then record it. Nobody is waiting on this.
-            writer.record(pid, name, path,
-                          "allow" if verdict == FAN_ALLOW else "block",
-                          reason)
+            writer.record(pid, name, path, label, reason)
 
 
 # Guarded so the supervision helpers above can be imported and tested

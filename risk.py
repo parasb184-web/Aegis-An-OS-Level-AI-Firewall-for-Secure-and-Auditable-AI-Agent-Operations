@@ -11,6 +11,7 @@ import time
 WINDOW = 10.0        # seconds of history we keep
 FILE_LIMIT = 15      # opens in the window before it looks like enumeration
 FOLDER_LIMIT = 4     # distinct folders before it looks like wandering
+WARN_AT = 30         # score that gets an operation logged but still allowed
 BLOCK_AT = 40        # score that gets an operation refused
 
 # One history per supervised root, each a list of (when, which folder).
@@ -62,6 +63,12 @@ def score(root):
         reasons.append("%d folders" % folders)
 
     return points, ", ".join(reasons)
+
+
+def is_warning(points):
+    # Scoring only ever produces 0, 30, 40 or 70, so 30 is the one value
+    # that can land here: wandering across folders without reading fast.
+    return WARN_AT <= points < BLOCK_AT
 
 
 def is_risky(points):
