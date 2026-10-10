@@ -90,6 +90,7 @@ def name_of_process(pid):
 
 roots = set()            # pids we supervise, plus everything beneath them
 supervised_cache = {}    # pid -> the root supervising it, or None
+roots_mtime = -1.0       # mtime of the roots file when we last read it
 last_sweep = 0.0
 
 
@@ -131,17 +132,23 @@ def read_roots_file(path):
     return found
 
 
-def sweep(path):
-    # Pids only ever flow IN from the file. The agent runs as our user, so
-    # it could delete its own line to escape supervision; we therefore treat
-    # the file as an inbox, never as the current truth. A root is dropped
-    # only when its process is gone, which the agent cannot fake.
-    global last_sweep
+def refresh_roots(path):
+    # One stat per event. This has to run on every open, not on the slower
+    # sweep below: an agent registers itself and starts reading immediately,
+    # and anything we miss in between would go unsupervised.
+    #
+    # Pids only ever flow IN from the file. The agent runs as our user and
+    # could delete its own line to escape, so the file is an inbox, never
+    # the current truth. Roots are released in sweep(), by death alone.
+    global roots_mtime
 
-    now = time.time()
-    if now - last_sweep < SWEEP_SECONDS:
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return                        # nothing registered yet
+    if mtime == roots_mtime:
         return
-    last_sweep = now
+    roots_mtime = mtime
 
     for pid in read_roots_file(path):
         if pid not in roots:
@@ -149,6 +156,18 @@ def sweep(path):
             # Anything we previously decided was unsupervised may now sit
             # under this new root, so the old answers cannot be trusted.
             supervised_cache.clear()
+
+
+def sweep(path):
+    # The expensive half: one stat per pid we are tracking. Once a second is
+    # soon enough to notice a process has exited, and keeps that cost off
+    # the path that every open waits on.
+    global roots_mtime, last_sweep
+
+    now = time.time()
+    if now - last_sweep < SWEEP_SECONDS:
+        return
+    last_sweep = now
 
     for pid in list(roots):
         if not alive(pid):
@@ -160,6 +179,10 @@ def sweep(path):
     for pid in list(supervised_cache):
         if not alive(pid):
             del supervised_cache[pid]
+
+    # Re-read next time even if the mtime looks unchanged, in case two
+    # registrations landed inside the same filesystem timestamp tick.
+    roots_mtime = -1.0
 
 
 def supervising_root(pid):
@@ -267,6 +290,7 @@ def main():
                 os.close(event_fd)
                 continue
 
+            refresh_roots(roots_path)
             sweep(roots_path)
 
             path = path_of(event_fd)
