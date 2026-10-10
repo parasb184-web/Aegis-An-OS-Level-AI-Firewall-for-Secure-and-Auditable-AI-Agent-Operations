@@ -2,7 +2,7 @@
 -- synthetic rows, for the index and trigger experiments.
 --
 -- Run with:
---   PGPASSWORD=aegis psql -U aegis -d aegis -h localhost -f sql/generate_dataset.sql
+--   psql -U aegis -d aegis -h localhost -f sql/generate_dataset.sql
 --
 -- Why a separate table and not actions itself:
 --   * actions now has the verdict_counts trigger; 2M fake rows would fire

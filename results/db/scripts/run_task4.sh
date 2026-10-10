@@ -1,7 +1,7 @@
 #!/bin/bash
 # Regenerate the dataset, then run the experiment while logging memory.
 cd ~/aegis
-export PGPASSWORD=aegis
+# Needs the database password in PGPASSWORD or ~/.pgpass.
 P="psql -U aegis -d aegis -h localhost -X"
 $P -f sql/generate_dataset.sql > results/db/task4_generate.txt 2>&1
 vmstat -S M 1 > results/db/task4_vmstat.txt &

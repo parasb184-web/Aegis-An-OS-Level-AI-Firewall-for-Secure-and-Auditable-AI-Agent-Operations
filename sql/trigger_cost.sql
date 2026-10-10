@@ -1,7 +1,7 @@
 -- How much does the verdict_counts trigger cost on inserts?
 --
 -- Run after sql/generate_dataset.sql and sql/counts_table.sql:
---   PGPASSWORD=aegis psql -U aegis -d aegis -h localhost -X \
+--   psql -U aegis -d aegis -h localhost -X \
 --       -f sql/trigger_cost.sql > results/db/task5_sql_raw.txt
 --   python3 results/db/scripts/medians.py results/db/task5_sql_raw.txt
 --

@@ -2,7 +2,7 @@
 --
 -- Run soon after sql/generate_dataset.sql (the ts query looks at the last
 -- 10 minutes, and the data ends at the moment the generator ran):
---   PGPASSWORD=aegis psql -U aegis -d aegis -h localhost -X \
+--   psql -U aegis -d aegis -h localhost -X \
 --       -f sql/index_experiment_v2.sql > results/db/task4_explain_raw.txt
 --   python3 results/db/scripts/medians.py results/db/task4_explain_raw.txt
 --

@@ -2,7 +2,7 @@
 -- reload them instead of needing a restart.
 --
 -- Run once on an existing database (a fresh one gets this from schema.sql):
---   PGPASSWORD=aegis psql -U aegis -d aegis -h localhost -f sql/policy_notify.sql
+--   psql -U aegis -d aegis -h localhost -f sql/policy_notify.sql
 -- Then watch it with: python3 sql/listen_demo.py
 
 -- FOR EACH STATEMENT, not FOR EACH ROW: a listener only needs to know

@@ -2,7 +2,7 @@
 # End-to-end check of LISTEN/NOTIFY: run the listener, change policies
 # from psql, and print what the listener saw. Leaves policies as it found them.
 cd ~/aegis
-export PGPASSWORD=aegis
+# Needs the database password in PGPASSWORD or ~/.pgpass.
 P="psql -U aegis -d aegis -h localhost -X -q"
 
 $P -f sql/policy_notify.sql

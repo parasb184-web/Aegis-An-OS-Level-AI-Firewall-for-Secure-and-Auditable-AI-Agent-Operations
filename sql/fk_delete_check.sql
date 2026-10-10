@@ -5,7 +5,7 @@
 -- parent_action = <deleted id>). There is no index on parent_action, so
 -- that check is a full scan of the table, once per deleted row.
 --
---   PGPASSWORD=aegis psql -U aegis -d aegis -h localhost -X \
+--   psql -U aegis -d aegis -h localhost -X \
 --       -f sql/fk_delete_check.sql > results/db/task5_fk_delete.txt
 --
 -- Runs on actions_exp (2M rows). Deletes 20 rows, rolled back.

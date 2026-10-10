@@ -1,7 +1,7 @@
 -- Remove policy rows that drifted from schema.sql.
 --
 -- Run with:
---   PGPASSWORD=aegis psql -U aegis -d aegis -h localhost -f sql/cleanup.sql
+--   psql -U aegis -d aegis -h localhost -f sql/cleanup.sql
 --
 -- At one point a 6th rule '%/.ssh/%' was added by hand to a live database.
 -- It is not in schema.sql and rule 1 ('/home/%/.ssh/%') already covers it.

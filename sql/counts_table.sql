@@ -2,7 +2,7 @@
 -- whole audit log every second.
 --
 -- Run once on an existing database (a fresh one gets this from schema.sql):
---   PGPASSWORD=aegis psql -U aegis -d aegis -h localhost -f sql/counts_table.sql
+--   psql -U aegis -d aegis -h localhost -f sql/counts_table.sql
 --
 -- Safe to run again: it recounts from actions and recreates the trigger.
 

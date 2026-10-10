@@ -1,7 +1,7 @@
 #!/bin/bash
 # Two sessions insert into the live actions table at the same time.
 # Both ROLLBACK, so no data is left behind.
-export PGPASSWORD=aegis
+# Needs the database password in PGPASSWORD or ~/.pgpass.
 Q="psql -U aegis -d aegis -h localhost -X -q"
 t0=$(date +%s.%N)
 since() { echo "$(date +%s.%N) - $t0" | bc | cut -c1-5; }
