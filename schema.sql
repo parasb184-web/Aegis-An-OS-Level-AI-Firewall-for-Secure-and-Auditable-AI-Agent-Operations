@@ -45,6 +45,19 @@ CREATE TRIGGER actions_count_verdict
     AFTER INSERT ON actions
     FOR EACH ROW EXECUTE FUNCTION count_verdict();
 
+-- Tell listeners (sql/listen_demo.py) when the rules change. Sent only on
+-- commit, once per statement.
+CREATE FUNCTION notify_policies_changed() RETURNS trigger AS $$
+BEGIN
+    PERFORM pg_notify('policies_changed', TG_OP);
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER policies_notify
+    AFTER INSERT OR UPDATE OR DELETE ON policies
+    FOR EACH STATEMENT EXECUTE FUNCTION notify_policies_changed();
+
 -- Starting rules.
 INSERT INTO policies (path_pattern, sensitivity, action, note) VALUES
   ('/home/%/.ssh/%',     'high', 'block', 'SSH private keys'),
