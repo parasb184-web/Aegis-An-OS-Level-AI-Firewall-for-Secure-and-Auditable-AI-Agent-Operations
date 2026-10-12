@@ -13,12 +13,14 @@ app = FastAPI()
 def counts():
     conn = db.connect()
     cur = conn.cursor()
-    cur.execute("SELECT verdict, COUNT(*) FROM actions GROUP BY verdict")
+    # Read the trigger-maintained totals instead of counting the whole log
+    # on every dashboard poll. See sql/counts_table.sql.
+    cur.execute("SELECT verdict, n FROM verdict_counts")
     rows = cur.fetchall()
     cur.close()
     conn.close()
 
-    result = {"allow": 0, "block": 0}
+    result = {"allow": 0, "block": 0, "warn": 0}
     for verdict, count in rows:
         result[verdict] = count
     return result

@@ -1,0 +1,40 @@
+Task 1: deterministic rule priority
+Run on 2026-10-10, WSL2 Ubuntu, PostgreSQL 18.6, live aegis database (5 rules).
+
+Test script (~/t1.py, not committed):
+    import sys
+    sys.path.insert(0, "/home/kusha/aegis")
+    import db
+    p = db.load_policies()
+    print([x[0] for x in p])
+    for t in ["/home/kusha/demo/project/.env", "/home/kusha/demo/project/src/app.py"]:
+        print(t, "->", db.check(p, t))
+
+Step 1. Change the physical (heap) order without changing any data.
+An UPDATE writes a new version of each row at the end of the table.
+
+    $ psql -c "UPDATE policies SET note = note WHERE id IN (1,2,3,4)"
+    UPDATE 4
+    $ psql -c "SELECT id FROM policies"
+     id
+    ----
+      5
+      1
+      2
+      3
+      4
+
+Step 2. OLD db.py (no ORDER BY):
+
+    $ python3 ~/t1.py
+    ['/home/*/project/*', '/home/*/.ssh/*', '/home/*/.aws/*', '*/.env', '/home/*/.gnupg/*']
+    /home/kusha/demo/project/.env -> ('allow', 'the agent workspace')      <-- BUG
+    /home/kusha/demo/project/src/app.py -> ('allow', 'the agent workspace')
+
+Step 3. NEW db.py (ORDER BY CASE action WHEN 'block' THEN 0 ELSE 1 END, id),
+same table, same scrambled heap order:
+
+    $ python3 ~/t1.py
+    ['/home/*/.ssh/*', '/home/*/.aws/*', '*/.env', '/home/*/.gnupg/*', '/home/*/project/*']
+    /home/kusha/demo/project/.env -> ('block', 'environment secrets')
+    /home/kusha/demo/project/src/app.py -> ('allow', 'the agent workspace')
