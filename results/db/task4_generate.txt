@@ -1,0 +1,37 @@
+Timing is on.
+DROP TABLE
+Time: 19.698 ms
+DROP TABLE
+Time: 25.327 ms
+CREATE TABLE
+Time: 25.936 ms
+INSERT 0 2000000
+Time: 7931.210 ms (00:07.931)
+CREATE TABLE
+Time: 3.947 ms
+INSERT 0 3
+Time: 502.398 ms
+VACUUM
+Time: 415.715 ms
+VACUUM
+Time: 2.047 ms
+ n_rows  |           oldest           |           newest           | distinct_paths 
+---------+----------------------------+----------------------------+----------------
+ 2000000 | 2026-10-03 08:15:33.590884 | 2026-10-10 08:15:33.288484 |           1800
+(1 row)
+
+Time: 1479.858 ms (00:01.480)
+ verdict |    n    
+---------+---------
+ allow   | 1800000
+ block   |  100000
+ warn    |  100000
+(3 rows)
+
+Time: 0.364 ms
+ table_size 
+------------
+ 253 MB
+(1 row)
+
+Time: 0.620 ms

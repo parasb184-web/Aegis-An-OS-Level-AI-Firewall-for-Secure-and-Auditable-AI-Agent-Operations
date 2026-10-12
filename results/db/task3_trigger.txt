@@ -1,0 +1,122 @@
+Sat Oct 10 08:12:58 UTC 2026
+
+### 1. fresh setup from schema.sql (throwaway schema, rolled back)
+== fresh setup from schema.sql inside a throwaway schema, rolled back at the end
+BEGIN
+CREATE SCHEMA
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+INSERT 0 3
+CREATE FUNCTION
+CREATE TRIGGER
+INSERT 0 5
+ verdict | n 
+---------+---
+ allow   | 0
+ block   | 0
+ warn    | 0
+(3 rows)
+
+INSERT 0 5
+== trigger counts vs real GROUP BY
+ verdict | n 
+---------+---
+ allow   | 1
+ block   | 2
+ review  | 1
+ warn    | 1
+(4 rows)
+
+ verdict | count 
+---------+-------
+ allow   |     1
+ block   |     2
+ review  |     1
+ warn    |     1
+(4 rows)
+
+ROLLBACK
+
+### 2. migration on live db (second run: shows it is re-runnable)
+BEGIN
+LOCK TABLE
+psql:sql/counts_table.sql:19: NOTICE:  relation "verdict_counts" already exists, skipping
+CREATE TABLE
+TRUNCATE TABLE
+INSERT 0 2
+INSERT 0 1
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+COMMIT
+ verdict | n  
+---------+----
+ allow   | 19
+ block   | 26
+ warn    |  0
+(3 rows)
+
+ verdict | count 
+---------+-------
+ allow   |    19
+ block   |    26
+(2 rows)
+
+
+### 3. atomicity on live actions table
+== atomicity: insert 3 rows on the live actions table, then ROLLBACK
+BEGIN
+INSERT 0 3
+-- inside the transaction
+ verdict | n  
+---------+----
+ allow   | 20
+ block   | 27
+ warn    |  1
+(3 rows)
+
+ROLLBACK
+-- after ROLLBACK: counter changes are undone with the log rows
+ verdict | n  
+---------+----
+ allow   | 19
+ block   | 26
+ warn    |  0
+(3 rows)
+
+ verdict | count 
+---------+-------
+ allow   |    19
+ block   |    26
+(2 rows)
+
+
+### 4. concurrency: two sessions, same and different verdict
+Time: 0.156 ms
+[B] insert block (different counter row):
+Time: 1.417 ms
+[B] insert allow (same counter row A has locked):
+== at t=2.011s, sessions waiting on a lock:
+ wait_event_type |  wait_event   |   locktype    |   mode    | granted |                                 query                                  
+-----------------+---------------+---------------+-----------+---------+------------------------------------------------------------------------
+ Lock            | transactionid | transactionid | ShareLock | f       | INSERT INTO actions (pid, path, verdict) VALUES (2, '/t/B2', 'allow');
+(1 row)
+
+Time: 2496.761 ms (00:02.497)
+Time: 0.315 ms
+[B] t=3.043s  finished
+[A] t=3.043s  inserted 'allow', held 3 s, rolled back
+== counts afterwards (unchanged, both rolled back):
+ verdict | n  
+---------+----
+ allow   | 19
+ block   | 26
+ warn    |  0
+(3 rows)
+
+
+### 5. API
+$ curl -s localhost:8765/counts
+{"allow":19,"block":26,"warn":0}

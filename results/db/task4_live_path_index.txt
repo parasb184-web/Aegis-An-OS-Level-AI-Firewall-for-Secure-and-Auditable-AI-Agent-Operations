@@ -1,0 +1,21 @@
+=== settings in effect (defaults, unchanged)
+ maintenance_work_mem 
+----------------------
+ 64MB
+(1 row)
+
+ rows_in_actions | table_size 
+-----------------+------------
+              45 | 8192 bytes
+(1 row)
+
+Timing is on.
+CREATE INDEX
+Time: 2.520 ms
+Timing is off.
+    indexname     |                              indexdef                               
+------------------+---------------------------------------------------------------------
+ actions_pkey     | CREATE UNIQUE INDEX actions_pkey ON public.actions USING btree (id)
+ idx_actions_path | CREATE INDEX idx_actions_path ON public.actions USING btree (path)
+(2 rows)
+

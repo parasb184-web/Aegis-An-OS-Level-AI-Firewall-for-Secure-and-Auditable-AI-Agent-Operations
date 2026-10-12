@@ -1,0 +1,19 @@
+label                   median_ms     min_ms     max_ms  top plan node
+a_ts_range_before          94.625     81.844     99.679  Limit
+                       runs 2-6: 99.679, 89.245, 97.799, 94.625, 81.844
+b_path_hit_before         191.558     66.265    235.022  Gather
+                       runs 2-6: 66.265, 74.771, 191.558, 235.022, 228.348
+b0_path_miss_before       218.967     83.700    335.320  Gather
+                       runs 2-6: 98.982, 83.700, 256.990, 218.967, 335.320
+c_groupby_before          601.458    277.111    772.773  Finalize GroupAggregate
+                       runs 2-6: 655.998, 601.458, 772.773, 549.371, 277.111
+c_summary_table             0.008      0.007      0.009  Seq Scan on verdict_counts_exp
+                       runs 2-6: 0.009, 0.008, 0.007, 0.007, 0.009
+a_ts_range_after            0.037      0.036      0.038  Limit
+                       runs 2-6: 0.037, 0.037, 0.037, 0.036, 0.038
+b_path_hit_after            1.014      0.911      1.126  Bitmap Heap Scan on actions_exp
+                       runs 2-6: 1.126, 1.092, 1.014, 0.939, 0.911
+b0_path_miss_after          0.013      0.010      0.016  Bitmap Heap Scan on actions_exp
+                       runs 2-6: 0.016, 0.013, 0.013, 0.012, 0.010
+c_groupby_after           197.417    186.872    248.427  Finalize GroupAggregate
+                       runs 2-6: 197.417, 186.872, 191.719, 230.542, 248.427

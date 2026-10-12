@@ -1,0 +1,26 @@
+--- 1. INSERT a test rule, then ROLLBACK (expect nothing)
+--- 2. INSERT the test rule, committed (expect INSERT, 6 rules)
+--- 3. three UPDATEs in one transaction (expect one UPDATE: duplicates merge)
+--- 4. DELETE the test rule (expect DELETE, back to 5 rules)
+=== listener output
+loaded 5 rules, waiting for changes
+--- 1. INSERT a test rule, then ROLLBACK (expect nothing)
+--- 2. INSERT the test rule, committed (expect INSERT, 6 rules)
+notify policies_changed: INSERT
+reloaded 6 rules
+--- 3. three UPDATEs in one transaction (expect one UPDATE: duplicates merge)
+notify policies_changed: UPDATE
+reloaded 6 rules
+--- 4. DELETE the test rule (expect DELETE, back to 5 rules)
+notify policies_changed: DELETE
+reloaded 5 rules
+=== policies afterwards
+ id |   path_pattern    | action 
+----+-------------------+--------
+  1 | /home/%/.ssh/%    | block
+  2 | /home/%/.aws/%    | block
+  3 | %/.env            | block
+  4 | /home/%/.gnupg/%  | block
+  5 | /home/%/project/% | allow
+(5 rows)
+

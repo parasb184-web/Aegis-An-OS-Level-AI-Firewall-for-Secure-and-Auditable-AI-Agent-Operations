@@ -1,0 +1,65 @@
+=== without an index on parent_action
+BEGIN
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Delete on actions_exp  (cost=2885.89..3054.61 rows=0 width=0) (actual time=21.418..21.419 rows=0.00 loops=1)
+   Buffers: shared hit=5058 read=346 written=2
+   ->  Nested Loop  (cost=2885.89..3054.61 rows=20 width=34) (actual time=20.112..20.147 rows=20.00 loops=1)
+         Buffers: shared hit=5017 read=344
+         ->  HashAggregate  (cost=2885.46..2885.66 rows=20 width=32) (actual time=19.828..19.833 rows=20.00 loops=1)
+               Group Key: "ANY_subquery".id
+               Batches: 1  Memory Usage: 32kB
+               Buffers: shared hit=4938 read=343
+               ->  Subquery Scan on "ANY_subquery"  (cost=0.00..2885.41 rows=20 width=32) (actual time=19.798..19.814 rows=20.00 loops=1)
+                     Buffers: shared hit=4938 read=343
+                     ->  Limit  (cost=0.00..2885.21 rows=20 width=4) (actual time=19.499..19.511 rows=20.00 loops=1)
+                           Buffers: shared hit=4938 read=343
+                           ->  Seq Scan on actions_exp actions_exp_1  (cost=0.00..60733.75 rows=421 width=4) (actual time=19.498..19.508 rows=20.00 loops=1)
+                                 Filter: (pid = 0)
+                                 Rows Removed by Filter: 219727
+                                 Buffers: shared hit=4938 read=343
+         ->  Index Scan using actions_exp_pkey on actions_exp  (cost=0.43..8.45 rows=1 width=10) (actual time=0.015..0.015 rows=1.00 loops=20)
+               Index Cond: (id = "ANY_subquery".id)
+               Index Searches: 20
+               Buffers: shared hit=79 read=1
+ Planning:
+   Buffers: shared hit=209 read=16
+ Planning Time: 3.729 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=3611.401 calls=20
+ Execution Time: 3634.783 ms
+(25 rows)
+
+ROLLBACK
+=== with an index on parent_action (index dropped again afterwards)
+BEGIN
+CREATE INDEX
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Delete on actions_exp  (cost=2972.03..3140.70 rows=0 width=0) (actual time=25.669..25.670 rows=0.00 loops=1)
+   Buffers: shared hit=7897
+   ->  Nested Loop  (cost=2972.03..3140.70 rows=20 width=34) (actual time=25.614..25.644 rows=20.00 loops=1)
+         Buffers: shared hit=7857
+         ->  HashAggregate  (cost=2971.60..2971.80 rows=20 width=32) (actual time=25.591..25.595 rows=20.00 loops=1)
+               Group Key: "ANY_subquery".id
+               Batches: 1  Memory Usage: 32kB
+               Buffers: shared hit=7777
+               ->  Subquery Scan on "ANY_subquery"  (cost=0.00..2971.55 rows=20 width=32) (actual time=25.567..25.580 rows=20.00 loops=1)
+                     Buffers: shared hit=7777
+                     ->  Limit  (cost=0.00..2971.35 rows=20 width=4) (actual time=25.559..25.567 rows=20.00 loops=1)
+                           Buffers: shared hit=7777
+                           ->  Seq Scan on actions_exp actions_exp_1  (cost=0.00..59427.00 rows=400 width=4) (actual time=25.557..25.564 rows=20.00 loops=1)
+                                 Filter: (pid = 0)
+                                 Rows Removed by Filter: 373590
+                                 Buffers: shared hit=7777
+         ->  Index Scan using actions_exp_pkey on actions_exp  (cost=0.43..8.45 rows=1 width=10) (actual time=0.002..0.002 rows=1.00 loops=20)
+               Index Cond: (id = "ANY_subquery".id)
+               Index Searches: 20
+               Buffers: shared hit=80
+ Planning:
+   Buffers: shared hit=12 read=4
+ Planning Time: 0.240 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=0.636 calls=20
+ Execution Time: 26.354 ms
+(25 rows)
+
+ROLLBACK
