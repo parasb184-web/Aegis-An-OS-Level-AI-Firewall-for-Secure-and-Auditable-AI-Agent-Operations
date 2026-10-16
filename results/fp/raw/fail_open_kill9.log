@@ -1,0 +1,143 @@
+2026-10-10 09:38:18  try=1  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:19  try=2  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:20  try=3  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:21  try=4  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:22  try=5  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:23  try=6  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:24  try=7  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:25  try=8  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:26  try=9  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:27  try=10  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:28  try=11  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:29  try=12  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:30  try=13  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:31  try=14  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:32  try=15  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:33  try=16  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:34  try=17  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:35  try=18  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:36  try=19  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:37  try=20  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:39  try=21  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:40  try=22  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:41  try=23  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:42  try=24  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:43  try=25  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:44  try=26  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:45  try=27  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:46  try=28  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:47  try=29  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:48  try=30  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:49  try=31  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:50  try=32  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:51  try=33  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:52  try=34  FAILED  cat: /home/mansi/demo/.ssh/id_rsa: Operation not permitted
+2026-10-10 09:38:53  try=35  OPENED  bytes=8
+2026-10-10 09:38:54  try=36  OPENED  bytes=8
+2026-10-10 09:38:55  try=37  OPENED  bytes=8
+2026-10-10 09:38:56  try=38  OPENED  bytes=8
+2026-10-10 09:38:57  try=39  OPENED  bytes=8
+2026-10-10 09:38:58  try=40  OPENED  bytes=8
+2026-10-10 09:38:59  try=41  OPENED  bytes=8
+2026-10-10 09:39:00  try=42  OPENED  bytes=8
+2026-10-10 09:39:01  try=43  OPENED  bytes=8
+2026-10-10 09:39:02  try=44  OPENED  bytes=8
+2026-10-10 09:39:03  try=45  OPENED  bytes=8
+2026-10-10 09:39:04  try=46  OPENED  bytes=8
+2026-10-10 09:39:05  try=47  OPENED  bytes=8
+2026-10-10 09:39:06  try=48  OPENED  bytes=8
+2026-10-10 09:39:07  try=49  OPENED  bytes=8
+2026-10-10 09:39:08  try=50  OPENED  bytes=8
+2026-10-10 09:39:09  try=51  OPENED  bytes=8
+2026-10-10 09:39:10  try=52  OPENED  bytes=8
+2026-10-10 09:39:11  try=53  OPENED  bytes=8
+2026-10-10 09:39:12  try=54  OPENED  bytes=8
+2026-10-10 09:39:13  try=55  OPENED  bytes=8
+2026-10-10 09:39:14  try=56  OPENED  bytes=8
+2026-10-10 09:39:15  try=57  OPENED  bytes=8
+2026-10-10 09:39:16  try=58  OPENED  bytes=8
+2026-10-10 09:39:18  try=59  OPENED  bytes=8
+2026-10-10 09:39:19  try=60  OPENED  bytes=8
+2026-10-10 09:39:20  try=61  OPENED  bytes=8
+2026-10-10 09:39:21  try=62  OPENED  bytes=8
+2026-10-10 09:39:22  try=63  OPENED  bytes=8
+2026-10-10 09:39:23  try=64  OPENED  bytes=8
+2026-10-10 09:39:24  try=65  OPENED  bytes=8
+2026-10-10 09:39:25  try=66  OPENED  bytes=8
+2026-10-10 09:39:26  try=67  OPENED  bytes=8
+2026-10-10 09:39:27  try=68  OPENED  bytes=8
+2026-10-10 09:39:28  try=69  OPENED  bytes=8
+2026-10-10 09:39:29  try=70  OPENED  bytes=8
+2026-10-10 09:39:30  try=71  OPENED  bytes=8
+2026-10-10 09:39:31  try=72  OPENED  bytes=8
+2026-10-10 09:39:32  try=73  OPENED  bytes=8
+2026-10-10 09:39:33  try=74  OPENED  bytes=8
+2026-10-10 09:39:34  try=75  OPENED  bytes=8
+2026-10-10 09:39:35  try=76  OPENED  bytes=8
+2026-10-10 09:39:36  try=77  OPENED  bytes=8
+2026-10-10 09:39:37  try=78  OPENED  bytes=8
+2026-10-10 09:39:38  try=79  OPENED  bytes=8
+2026-10-10 09:39:39  try=80  OPENED  bytes=8
+2026-10-10 09:39:40  try=81  OPENED  bytes=8
+2026-10-10 09:39:41  try=82  OPENED  bytes=8
+2026-10-10 09:39:42  try=83  OPENED  bytes=8
+2026-10-10 09:39:43  try=84  OPENED  bytes=8
+2026-10-10 09:39:44  try=85  OPENED  bytes=8
+2026-10-10 09:39:45  try=86  OPENED  bytes=8
+2026-10-10 09:39:46  try=87  OPENED  bytes=8
+2026-10-10 09:39:47  try=88  OPENED  bytes=8
+2026-10-10 09:39:48  try=89  OPENED  bytes=8
+2026-10-10 09:39:49  try=90  OPENED  bytes=8
+2026-10-10 09:39:50  try=91  OPENED  bytes=8
+2026-10-10 09:39:51  try=92  OPENED  bytes=8
+2026-10-10 09:39:52  try=93  OPENED  bytes=8
+2026-10-10 09:39:53  try=94  OPENED  bytes=8
+2026-10-10 09:39:54  try=95  OPENED  bytes=8
+2026-10-10 09:39:55  try=96  OPENED  bytes=8
+2026-10-10 09:39:56  try=97  OPENED  bytes=8
+2026-10-10 09:39:57  try=98  OPENED  bytes=8
+2026-10-10 09:39:58  try=99  OPENED  bytes=8
+2026-10-10 09:40:00  try=100  OPENED  bytes=8
+2026-10-10 09:40:01  try=101  OPENED  bytes=8
+2026-10-10 09:40:02  try=102  OPENED  bytes=8
+2026-10-10 09:40:03  try=103  OPENED  bytes=8
+2026-10-10 09:40:04  try=104  OPENED  bytes=8
+2026-10-10 09:40:05  try=105  OPENED  bytes=8
+2026-10-10 09:40:06  try=106  OPENED  bytes=8
+2026-10-10 09:40:07  try=107  OPENED  bytes=8
+2026-10-10 09:40:08  try=108  OPENED  bytes=8
+2026-10-10 09:40:09  try=109  OPENED  bytes=8
+2026-10-10 09:40:10  try=110  OPENED  bytes=8
+2026-10-10 09:40:11  try=111  OPENED  bytes=8
+2026-10-10 09:40:12  try=112  OPENED  bytes=8
+2026-10-10 09:40:13  try=113  OPENED  bytes=8
+2026-10-10 09:40:14  try=114  OPENED  bytes=8
+2026-10-10 09:40:15  try=115  OPENED  bytes=8
+2026-10-10 09:40:16  try=116  OPENED  bytes=8
+2026-10-10 09:40:17  try=117  OPENED  bytes=8
+2026-10-10 09:40:18  try=118  OPENED  bytes=8
+2026-10-10 09:40:19  try=119  OPENED  bytes=8
+2026-10-10 09:40:20  try=120  OPENED  bytes=8
+2026-10-10 09:40:21  try=121  OPENED  bytes=8
+2026-10-10 09:40:22  try=122  OPENED  bytes=8
+2026-10-10 09:40:23  try=123  OPENED  bytes=8
+2026-10-10 09:40:24  try=124  OPENED  bytes=8
+2026-10-10 09:40:25  try=125  OPENED  bytes=8
+2026-10-10 09:40:26  try=126  OPENED  bytes=8
+2026-10-10 09:40:27  try=127  OPENED  bytes=8
+2026-10-10 09:40:28  try=128  OPENED  bytes=8
+2026-10-10 09:40:29  try=129  OPENED  bytes=8
+2026-10-10 09:40:30  try=130  OPENED  bytes=8
+2026-10-10 09:40:31  try=131  OPENED  bytes=8
+2026-10-10 09:40:32  try=132  OPENED  bytes=8
+2026-10-10 09:40:33  try=133  OPENED  bytes=8
+2026-10-10 09:40:34  try=134  OPENED  bytes=8
+2026-10-10 09:40:35  try=135  OPENED  bytes=8
+2026-10-10 09:40:36  try=136  OPENED  bytes=8
+2026-10-10 09:40:37  try=137  OPENED  bytes=8
+2026-10-10 09:40:39  try=138  OPENED  bytes=8
+2026-10-10 09:40:40  try=139  OPENED  bytes=8
+2026-10-10 09:40:41  try=140  OPENED  bytes=8
+2026-10-10 09:40:42  try=141  OPENED  bytes=8
+2026-10-10 09:40:43  try=142  OPENED  bytes=8
+2026-10-10 09:40:44  try=143  OPENED  bytes=8

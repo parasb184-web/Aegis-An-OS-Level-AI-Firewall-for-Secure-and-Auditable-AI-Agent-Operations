@@ -1,0 +1,264 @@
+./README.rst:    import click
+./src/click/parser.py:import typing as t
+./src/click/parser.py:from collections import deque
+./src/click/parser.py:from gettext import gettext as _
+./src/click/parser.py:from gettext import ngettext
+./src/click/parser.py:from .exceptions import BadArgumentUsage
+./src/click/parser.py:from .exceptions import BadOptionUsage
+./src/click/parser.py:from .exceptions import NoSuchOption
+./src/click/parser.py:from .exceptions import UsageError
+./src/click/parser.py:    import typing_extensions as te
+./src/click/parser.py:    from .core import Argument as CoreArgument
+./src/click/parser.py:    from .core import Context
+./src/click/parser.py:    from .core import Option as CoreOption
+./src/click/parser.py:    from .core import Parameter as CoreParameter
+./src/click/parser.py:    import shlex
+./src/click/parser.py:            from difflib import get_close_matches
+./src/click/__init__.py:from .core import Argument as Argument
+./src/click/__init__.py:from .core import BaseCommand as BaseCommand
+./src/click/__init__.py:from .core import Command as Command
+./src/click/__init__.py:from .core import CommandCollection as CommandCollection
+./src/click/__init__.py:from .core import Context as Context
+./src/click/__init__.py:from .core import Group as Group
+./src/click/__init__.py:from .core import MultiCommand as MultiCommand
+./src/click/__init__.py:from .core import Option as Option
+./src/click/__init__.py:from .core import Parameter as Parameter
+./src/click/__init__.py:from .decorators import argument as argument
+./src/click/__init__.py:from .decorators import command as command
+./src/click/__init__.py:from .decorators import confirmation_option as confirmation_option
+./src/click/__init__.py:from .decorators import group as group
+./src/click/__init__.py:from .decorators import help_option as help_option
+./src/click/__init__.py:from .decorators import make_pass_decorator as make_pass_decorator
+./src/click/__init__.py:from .decorators import option as option
+./src/click/__init__.py:from .decorators import pass_context as pass_context
+./src/click/__init__.py:from .decorators import pass_obj as pass_obj
+./src/click/__init__.py:from .decorators import password_option as password_option
+./src/click/__init__.py:from .decorators import version_option as version_option
+./src/click/__init__.py:from .exceptions import Abort as Abort
+./src/click/__init__.py:from .exceptions import BadArgumentUsage as BadArgumentUsage
+./src/click/__init__.py:from .exceptions import BadOptionUsage as BadOptionUsage
+./src/click/__init__.py:from .exceptions import BadParameter as BadParameter
+./src/click/__init__.py:from .exceptions import ClickException as ClickException
+./src/click/__init__.py:from .exceptions import FileError as FileError
+./src/click/__init__.py:from .exceptions import MissingParameter as MissingParameter
+./src/click/__init__.py:from .exceptions import NoSuchOption as NoSuchOption
+./src/click/__init__.py:from .exceptions import UsageError as UsageError
+./src/click/__init__.py:from .formatting import HelpFormatter as HelpFormatter
+./src/click/__init__.py:from .formatting import wrap_text as wrap_text
+./src/click/__init__.py:from .globals import get_current_context as get_current_context
+./src/click/__init__.py:from .parser import OptionParser as OptionParser
+./src/click/__init__.py:from .termui import clear as clear
+./src/click/__init__.py:from .termui import confirm as confirm
+./src/click/__init__.py:from .termui import echo_via_pager as echo_via_pager
+./src/click/__init__.py:from .termui import edit as edit
+./src/click/__init__.py:from .termui import getchar as getchar
+./src/click/__init__.py:from .termui import launch as launch
+./src/click/__init__.py:from .termui import pause as pause
+./src/click/__init__.py:from .termui import progressbar as progressbar
+./src/click/__init__.py:from .termui import prompt as prompt
+./src/click/__init__.py:from .termui import secho as secho
+./src/click/__init__.py:from .termui import style as style
+./src/click/__init__.py:from .termui import unstyle as unstyle
+./src/click/__init__.py:from .types import BOOL as BOOL
+./src/click/__init__.py:from .types import Choice as Choice
+./src/click/__init__.py:from .types import DateTime as DateTime
+./src/click/__init__.py:from .types import File as File
+./src/click/__init__.py:from .types import FLOAT as FLOAT
+./src/click/__init__.py:from .types import FloatRange as FloatRange
+./src/click/__init__.py:from .types import INT as INT
+./src/click/__init__.py:from .types import IntRange as IntRange
+./src/click/__init__.py:from .types import ParamType as ParamType
+./src/click/__init__.py:from .types import Path as Path
+./src/click/__init__.py:from .types import STRING as STRING
+./src/click/__init__.py:from .types import Tuple as Tuple
+./src/click/__init__.py:from .types import UNPROCESSED as UNPROCESSED
+./src/click/__init__.py:from .types import UUID as UUID
+./src/click/__init__.py:from .utils import echo as echo
+./src/click/__init__.py:from .utils import format_filename as format_filename
+./src/click/__init__.py:from .utils import get_app_dir as get_app_dir
+./src/click/__init__.py:from .utils import get_binary_stream as get_binary_stream
+./src/click/__init__.py:from .utils import get_text_stream as get_text_stream
+./src/click/__init__.py:from .utils import open_file as open_file
+./src/click/core.py:import enum
+./src/click/core.py:import errno
+./src/click/core.py:import inspect
+./src/click/core.py:import os
+./src/click/core.py:import sys
+./src/click/core.py:import typing as t
+./src/click/core.py:from collections import abc
+./src/click/core.py:from contextlib import contextmanager
+./src/click/core.py:from contextlib import ExitStack
+./src/click/core.py:from functools import update_wrapper
+./src/click/core.py:from gettext import gettext as _
+./src/click/core.py:from gettext import ngettext
+./src/click/core.py:from itertools import repeat
+./src/click/core.py:from types import TracebackType
+./src/click/core.py:from . import types
+./src/click/core.py:from .exceptions import Abort
+./src/click/core.py:from .exceptions import BadParameter
+./src/click/core.py:from .exceptions import ClickException
+./src/click/core.py:from .exceptions import Exit
+./src/click/core.py:from .exceptions import MissingParameter
+./src/click/core.py:from .exceptions import UsageError
+./src/click/core.py:from .formatting import HelpFormatter
+./src/click/core.py:from .formatting import join_options
+./src/click/core.py:from .globals import pop_context
+./src/click/core.py:from .globals import push_context
+./src/click/core.py:from .parser import _flag_needs_value
+./src/click/core.py:from .parser import OptionParser
+./src/click/core.py:from .parser import split_opt
+./src/click/core.py:from .termui import confirm
+./src/click/core.py:from .termui import prompt
+./src/click/core.py:from .termui import style
+./src/click/core.py:from .utils import _detect_program_name
+./src/click/core.py:from .utils import _expand_args
+./src/click/core.py:from .utils import echo
+./src/click/core.py:from .utils import make_default_short_help
+./src/click/core.py:from .utils import make_str
+./src/click/core.py:from .utils import PacifyFlushWrapper
+./src/click/core.py:    import typing_extensions as te
+./src/click/core.py:    from .shell_completion import CompletionItem
+./src/click/core.py:        irrelevant for the operation of click.  However what is important is
+./src/click/core.py:        from click.shell_completion import CompletionItem
+./src/click/core.py:        from .shell_completion import shell_complete
+./src/click/core.py:        from click.shell_completion import CompletionItem
+./src/click/core.py:        from click.shell_completion import CompletionItem
+./src/click/core.py:        from .decorators import command
+./src/click/core.py:        from .decorators import group
+./src/click/core.py:                from click.shell_completion import CompletionItem
+./src/click/decorators.py:import inspect
+./src/click/decorators.py:import types
+./src/click/decorators.py:import typing as t
+./src/click/decorators.py:from functools import update_wrapper
+./src/click/decorators.py:from gettext import gettext as _
+./src/click/decorators.py:from .core import Argument
+./src/click/decorators.py:from .core import Command
+./src/click/decorators.py:from .core import Context
+./src/click/decorators.py:from .core import Group
+./src/click/decorators.py:from .core import Option
+./src/click/decorators.py:from .core import Parameter
+./src/click/decorators.py:from .globals import get_current_context
+./src/click/decorators.py:from .utils import echo
+./src/click/decorators.py:    import typing_extensions as te
+./src/click/decorators.py:        from functools import update_wrapper
+./src/click/decorators.py:    :func:`importlib.metadata.version` to get the version for the
+./src/click/decorators.py:    ``package_name``. On Python < 3.8, the ``importlib_metadata``
+./src/click/decorators.py:        Use :mod:`importlib.metadata` instead of ``pkg_resources``. The
+./src/click/decorators.py:                from importlib import metadata  # type: ignore
+./src/click/decorators.py:                import importlib_metadata as metadata  # type: ignore
+./src/click/_winconsole.py:import io
+./src/click/_winconsole.py:import sys
+./src/click/_winconsole.py:import time
+./src/click/_winconsole.py:import typing as t
+./src/click/_winconsole.py:from ctypes import byref
+./src/click/_winconsole.py:from ctypes import c_char
+./src/click/_winconsole.py:from ctypes import c_char_p
+./src/click/_winconsole.py:from ctypes import c_int
+./src/click/_winconsole.py:from ctypes import c_ssize_t
+./src/click/_winconsole.py:from ctypes import c_ulong
+./src/click/_winconsole.py:from ctypes import c_void_p
+./src/click/_winconsole.py:from ctypes import POINTER
+./src/click/_winconsole.py:from ctypes import py_object
+./src/click/_winconsole.py:from ctypes import Structure
+./src/click/_winconsole.py:from ctypes.wintypes import DWORD
+./src/click/_winconsole.py:from ctypes.wintypes import HANDLE
+./src/click/_winconsole.py:from ctypes.wintypes import LPCWSTR
+./src/click/_winconsole.py:from ctypes.wintypes import LPWSTR
+./src/click/_winconsole.py:from ._compat import _NonClosingTextIOWrapper
+./src/click/_winconsole.py:import msvcrt  # noqa: E402
+./src/click/_winconsole.py:from ctypes import windll  # noqa: E402
+./src/click/_winconsole.py:from ctypes import WINFUNCTYPE  # noqa: E402
+./src/click/_winconsole.py:    from ctypes import pythonapi
+./src/click/_termui_impl.py:import time of Click down, some infrequently used functionality is
+./src/click/_termui_impl.py:placed in this module and only imported as needed.
+./src/click/_termui_impl.py:import contextlib
+./src/click/_termui_impl.py:import math
+./src/click/_termui_impl.py:import os
+./src/click/_termui_impl.py:import sys
+./src/click/_termui_impl.py:import time
+./src/click/_termui_impl.py:import typing as t
+./src/click/_termui_impl.py:from gettext import gettext as _
+./src/click/_termui_impl.py:from io import StringIO
+./src/click/_termui_impl.py:from types import TracebackType
+./src/click/_termui_impl.py:from ._compat import _default_text_stdout
+./src/click/_termui_impl.py:from ._compat import CYGWIN
+./src/click/_termui_impl.py:from ._compat import get_best_encoding
+./src/click/_termui_impl.py:from ._compat import isatty
+./src/click/_termui_impl.py:from ._compat import open_stream
+./src/click/_termui_impl.py:from ._compat import strip_ansi
+./src/click/_termui_impl.py:from ._compat import term_len
+./src/click/_termui_impl.py:from ._compat import WIN
+./src/click/_termui_impl.py:from .exceptions import ClickException
+./src/click/_termui_impl.py:from .utils import echo
+./src/click/_termui_impl.py:            from operator import length_hint
+./src/click/_termui_impl.py:        import shutil
+./src/click/_termui_impl.py:    import tempfile
+./src/click/_termui_impl.py:    import subprocess
+./src/click/_termui_impl.py:    import tempfile
+./src/click/_termui_impl.py:        import subprocess
+./src/click/_termui_impl.py:        import tempfile
+./src/click/_termui_impl.py:    import subprocess
+./src/click/_termui_impl.py:        from urllib.parse import unquote
+./src/click/_termui_impl.py:            import webbrowser
+./src/click/_termui_impl.py:    import msvcrt
+./src/click/_termui_impl.py:    import tty
+./src/click/_termui_impl.py:    import termios
+./src/click/_compat.py:import codecs
+./src/click/_compat.py:import io
+./src/click/_compat.py:import os
+./src/click/_compat.py:import re
+./src/click/_compat.py:import sys
+./src/click/_compat.py:import typing as t
+./src/click/_compat.py:from weakref import WeakKeyDictionary
+./src/click/_compat.py:    import errno
+./src/click/_compat.py:    import random
+./src/click/_compat.py:    from ._winconsole import _get_windows_console_stream
+./src/click/_compat.py:        import locale
+./src/click/_compat.py:        import colorama
+./src/click/exceptions.py:import typing as t
+./src/click/exceptions.py:from gettext import gettext as _
+./src/click/exceptions.py:from gettext import ngettext
+./src/click/exceptions.py:from ._compat import get_text_stderr
+./src/click/exceptions.py:from .utils import echo
+./src/click/exceptions.py:from .utils import format_filename
+./src/click/exceptions.py:    from .core import Command
+./src/click/exceptions.py:    from .core import Context
+./src/click/exceptions.py:    from .core import Parameter
+./src/click/formatting.py:import typing as t
+./src/click/formatting.py:from contextlib import contextmanager
+./src/click/formatting.py:from gettext import gettext as _
+./src/click/formatting.py:from ._compat import term_len
+./src/click/formatting.py:from .parser import split_opt
+./src/click/formatting.py:    from ._textwrap import TextWrapper
+./src/click/formatting.py:        import shutil
+./src/click/shell_completion.py:import os
+./src/click/shell_completion.py:import re
+./src/click/shell_completion.py:import typing as t
+./src/click/shell_completion.py:from gettext import gettext as _
+./src/click/shell_completion.py:from .core import Argument
+./src/click/shell_completion.py:from .core import BaseCommand
+./src/click/shell_completion.py:from .core import Context
+./src/click/shell_completion.py:from .core import MultiCommand
+./src/click/shell_completion.py:from .core import Option
+./src/click/shell_completion.py:from .core import Parameter
+./src/click/shell_completion.py:from .core import ParameterSource
+./src/click/shell_completion.py:from .parser import split_arg_string
+./src/click/shell_completion.py:from .utils import echo
+./src/click/shell_completion.py:        import subprocess
+./src/click/testing.py:import contextlib
+./src/click/testing.py:import io
+./src/click/testing.py:import os
+./src/click/testing.py:import shlex
+./src/click/testing.py:import shutil
+./src/click/testing.py:import sys
+./src/click/testing.py:import tempfile
+./src/click/testing.py:import typing as t
+./src/click/testing.py:from types import TracebackType
+./src/click/testing.py:from . import formatting
+./src/click/testing.py:from . import termui
+./src/click/testing.py:from . import utils
+./src/click/testing.py:from ._compat import _find_binary_reader
+./src/click/testing.py:    from .core import BaseCommand
+./src/click/_textwrap.py:import textwrap
+./src/click/_textwrap.py:import typing as t
+./src/click/_textwrap.py:from contextlib import contextmanager

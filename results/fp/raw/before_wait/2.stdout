@@ -1,0 +1,31 @@
+commit 874ca2bc1c30d93a4ac6e36a15ed685eafe89097
+Author: David Lord <davidism@gmail.com>
+Date:   Thu Aug 17 10:24:49 2023 -0700
+
+    release version 8.1.7
+
+commit 6e1f6d3052b6459fa3e43392d728376c423a7d4c
+Merge: a260ca6 a955c77
+Author: David Lord <davidism@gmail.com>
+Date:   Thu Aug 17 10:20:12 2023 -0700
+
+    completion(fish): add back ; as line endings in fish script (#2570)
+
+commit a955c77719981af390b6d2349730c590c80e11e9
+Author: Peter Dragun <peter.dragun@espressif.com>
+Date:   Mon Jul 24 09:47:11 2023 +0200
+
+    update fish enabling script
+
+commit 3c1529e6bc12118ff5a83b2f81fc52f625367736
+Author: Peter Dragun <peter.dragun@espressif.com>
+Date:   Wed Jul 19 09:06:03 2023 +0200
+
+    add back semicolons in fish script
+
+commit a260ca6fa7675a87dc55c4c79cebad3de2d9ed6d
+Merge: 22b9b1c d9db70c
+Author: David Lord <davidism@gmail.com>
+Date:   Thu Aug 17 10:13:30 2023 -0700
+
+    Replace bash shell completion version error with warning (#2576)

@@ -1,0 +1,7 @@
+n	command	pid	blocked_opens	total_opens	exit	eperm_lines	runtime_s
+1	git status	2051	420	435	128	1	0.128
+2	git log -5	2066	0	8	0	0	0.049
+3	grep -r "import" .	2078	160	175	2	160	1.873
+4	find . -name "*.py"	2091	0	0	0	0	0.037
+5	ls -R	2107	0	0	0	0	0.033
+6	env PYTHONPATH=src python3 -m pytest --collect-only -q -p no:cacheprovider	2120	20	35	2	20	1.443

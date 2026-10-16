@@ -1,0 +1,8 @@
+repo:      https://github.com/pallets/click.git @ 8.1.7
+commit:    874ca2bc1c30d93a4ac6e36a15ed685eafe89097
+files (excluding .git): 146
+files (including .git): 174
+folders the daemon will mark: 41
+.env files: 0
+
+NOW RESTART THE DAEMON so it marks the new folders.
