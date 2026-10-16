@@ -1,9 +1,11 @@
 # Small web server that reads the audit log for the dashboard.
 # It only reads. All the deciding happens in daemon.py.
 
+import json
 import os
 import subprocess
 import threading
+import time
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -22,6 +24,15 @@ SCENARIOS = ("normal", "credentials", "massread")
 # Where run_agent.sh registers agent pids. Same resolution order, so the
 # dashboard and the shell script always agree on which file the daemon reads.
 ROOTS_FILE = os.environ.get("AEGIS_ROOTS", "/tmp/aegis_roots")
+
+# Where the daemon publishes its heartbeat and live risk window. The risk
+# score only exists in the daemon's memory, so this file is the only honest
+# source for a score that rises as an agent reads.
+STATUS_FILE = os.environ.get("AEGIS_STATUS", "/tmp/aegis_status.json")
+
+# How far behind the heartbeat may fall before we call the daemon stopped.
+# It publishes once a second, so three seconds is slack without being slow.
+STATUS_STALE_AFTER = 3.0
 
 # fake_agent.py lives next to this file, and it opens paths relative to the
 # repo, so the child has to start there whatever directory uvicorn was run
@@ -310,6 +321,28 @@ def process(pid: int):
         "alive": bool(chain),
         "chain": chain,
     }
+
+
+@app.get("/daemon")
+def daemon_state():
+    # Whether the daemon is alive, and what its risk window currently holds.
+    # Absent file or a stale heartbeat both mean stopped -- which is worth
+    # showing plainly, because Aegis fails open: with the daemon gone, files
+    # that would be refused are simply opened and nothing is recorded.
+    try:
+        with open(STATUS_FILE) as f:
+            state = json.load(f)
+    except (OSError, ValueError):
+        return {"running": False, "reason": "no status file", "agents": []}
+
+    age = time.time() - state.get("at", 0)
+    if age > STATUS_STALE_AFTER:
+        return {"running": False, "reason": "heartbeat %.0fs old" % age,
+                "agents": [], "watching": state.get("watching")}
+
+    state["running"] = True
+    state["age"] = age
+    return state
 
 
 @app.get("/run")

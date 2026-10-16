@@ -6,11 +6,13 @@
 # waiting on a database write.
 
 import ctypes
+import json
 import os
 import signal
 import struct
 import sys
 import time
+import tempfile
 import risk
 import db
 import writer
@@ -38,6 +40,13 @@ SWEEP_SECONDS = 1.0
 
 # A parent chain this long means something is wrong; stop rather than spin.
 MAX_DEPTH = 40
+
+# Where we publish what we are doing, so the dashboard can show a live risk
+# score and tell whether we are still alive. The risk window lives in this
+# process's memory and is never written to the database -- the database only
+# records a score once a row has already been blocked or warned -- so without
+# this file there is no honest way to show a score that rises.
+DEFAULT_STATUS = "/tmp/aegis_status.json"
 
 EVENT_FORMAT = "<IBBHQii"
 
@@ -88,6 +97,10 @@ def name_of_process(pid):
 # We are told the pid of one process (the root) and we supervise it and
 # everything it starts. For each open we walk up the parent chain: reach a
 # root and this is the agent, reach init first and it is somebody else.
+
+status_path = None       # where we publish our state, set in main()
+watching = None          # the folder we were pointed at, for the status file
+roots_file = None        # the roots file we were told to read
 
 roots = set()            # pids we supervise, plus everything beneath them
 supervised_cache = {}    # pid -> the root supervising it, or None
@@ -185,6 +198,53 @@ def sweep(path):
     # registrations landed inside the same filesystem timestamp tick.
     roots_mtime = -1.0
 
+    publish_status()
+
+
+def publish_status():
+    # A heartbeat plus the current risk window per supervised root. Written
+    # whole to a temporary file and renamed, so a reader never sees half a
+    # file. Failures are ignored: publishing is for the dashboard's benefit
+    # and must never take the daemon down.
+    if not status_path:
+        return
+
+    agents = []
+    now = time.time()
+    for root in sorted(roots):
+        opens = risk.history.get(root, [])
+        points, why = risk.score(root)
+        agents.append({
+            "root": root,
+            "name": name_of_process(root),
+            "files": len(opens),
+            "folders": len(set(folder for when, folder in opens)),
+            "score": points,
+            "why": why,
+        })
+
+    state = {
+        "pid": os.getpid(),
+        "at": now,
+        "watching": watching,
+        "roots_file": roots_file,
+        "window": risk.WINDOW,
+        "file_limit": risk.FILE_LIMIT,
+        "folder_limit": risk.FOLDER_LIMIT,
+        "warn_at": risk.WARN_AT,
+        "block_at": risk.BLOCK_AT,
+        "agents": agents,
+    }
+
+    try:
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(status_path) or ".")
+        with os.fdopen(fd, "w") as f:
+            json.dump(state, f)
+        os.chmod(tmp, 0o644)        # the API runs as the user, we run as root
+        os.replace(tmp, status_path)
+    except OSError:
+        pass
+
 
 def supervising_root(pid):
     # Returns the root that supervises this pid, or None if it is not part
@@ -253,11 +313,20 @@ def main():
 
     folder = sys.argv[1]
     roots_path = DEFAULT_ROOTS
-    if len(sys.argv) == 4 and sys.argv[2] == "--roots":
-        roots_path = sys.argv[3]
-    elif len(sys.argv) != 2:
-        print("usage: sudo python3 daemon.py <folder> [--roots <file>]")
-        sys.exit(1)
+    status = DEFAULT_STATUS
+
+    # Two optional flags, in any order. A loop rather than argparse keeps the
+    # whole of this file readable without knowing a library.
+    rest = sys.argv[2:]
+    while rest:
+        if rest[0] == "--roots" and len(rest) > 1:
+            roots_path = rest[1]; rest = rest[2:]
+        elif rest[0] == "--status" and len(rest) > 1:
+            status = rest[1]; rest = rest[2:]
+        else:
+            print("usage: sudo python3 daemon.py <folder> "
+                  "[--roots <file>] [--status <file>]")
+            sys.exit(1)
 
     if not os.path.isdir(folder):
         print("not a folder:", folder)
@@ -276,6 +345,12 @@ def main():
     policies = db.load_policies()
     writer.start()
 
+    global status_path, watching, roots_file
+    status_path = status
+    watching = folder
+    roots_file = roots_path
+    publish_status()            # so the dashboard lights up straight away
+
     # From here on the writer thread holds audit rows in memory, so every
     # exit path has to go through writer.stop(). It is not a daemon thread
     # any more, so skipping that would hang the process instead of losing
@@ -286,6 +361,7 @@ def main():
     print("watching %s" % folder)
     print("loaded %d policy rules" % len(policies))
     print("agent roots file: %s" % roots_path)
+    print("status file: %s" % status)
     print()
 
     my_pid = os.getpid()
@@ -335,6 +411,13 @@ def main():
     except KeyboardInterrupt:
         # Raised by on_signal() for SIGINT and SIGTERM. Not an error, so
         # we swallow it rather than printing a traceback at the user.
+        pass
+
+    # Remove the status file so the dashboard shows us as stopped at once,
+    # rather than waiting for the heartbeat to look stale.
+    try:
+        os.remove(status_path)
+    except OSError:
         pass
 
     print()
