@@ -7,6 +7,7 @@
 
 import ctypes
 import os
+import signal
 import struct
 import sys
 import time
@@ -233,6 +234,14 @@ def decide(policies, path, root):
 
     return FAN_ALLOW, "allow", "no rule"
 
+def on_signal(signum, frame):
+    # Signal handlers run in the main thread, so raising from here unblocks
+    # the os.read() in main(). Returning normally would not: the kernel
+    # restarts an interrupted read, so we would not react to Ctrl+C until the
+    # next file open happened to arrive.
+    raise KeyboardInterrupt
+
+
 def answer(fan_fd, event_fd, verdict):
     os.write(fan_fd, struct.pack("<iI", event_fd, verdict))
 
@@ -267,6 +276,13 @@ def main():
     policies = db.load_policies()
     writer.start()
 
+    # From here on the writer thread holds audit rows in memory, so every
+    # exit path has to go through writer.stop(). It is not a daemon thread
+    # any more, so skipping that would hang the process instead of losing
+    # the rows.
+    signal.signal(signal.SIGINT, on_signal)
+    signal.signal(signal.SIGTERM, on_signal)
+
     print("watching %s" % folder)
     print("loaded %d policy rules" % len(policies))
     print("agent roots file: %s" % roots_path)
@@ -274,46 +290,62 @@ def main():
 
     my_pid = os.getpid()
 
-    while True:
-        data = os.read(fan_fd, 4096)
-        offset = 0
-        while offset < len(data):
-            fields = struct.unpack_from(EVENT_FORMAT, data, offset)
-            event_len, version, reserved, meta_len, mask, event_fd, pid = fields
-            offset = offset + event_len
+    try:
+        while True:
+            data = os.read(fan_fd, 4096)
+            offset = 0
+            while offset < len(data):
+                fields = struct.unpack_from(EVENT_FORMAT, data, offset)
+                event_len, version, reserved, meta_len, mask, event_fd, pid = fields
+                offset = offset + event_len
 
-            if event_fd < 0:
-                continue
+                if event_fd < 0:
+                    continue
 
-            if pid == my_pid:
-                answer(fan_fd, event_fd, FAN_ALLOW)
+                if pid == my_pid:
+                    answer(fan_fd, event_fd, FAN_ALLOW)
+                    os.close(event_fd)
+                    continue
+
+                refresh_roots(roots_path)
+                sweep(roots_path)
+
+                path = path_of(event_fd)
+                root = supervising_root(pid)
+
+                if root is None:
+                    # Not part of the agent tree. We stay out of its way, but we
+                    # still log it so we can show what we chose not to touch.
+                    verdict, label, reason = FAN_ALLOW, "allow", "not supervised"
+                else:
+                    verdict, label, reason = decide(policies, path, root)
+
+                name = name_of_process(pid)
+
+                print("%-8s pid=%-7d %s  ->  %s (%s)" % (
+                    name, pid, path, label.upper(), reason))
+
+                # Answer the kernel FIRST so the paused process gets going again.
+                answer(fan_fd, event_fd, verdict)
                 os.close(event_fd)
-                continue
 
-            refresh_roots(roots_path)
-            sweep(roots_path)
+                # Then record it. Nobody is waiting on this.
+                writer.record(pid, name, path, label, reason)
 
-            path = path_of(event_fd)
-            root = supervising_root(pid)
+    except KeyboardInterrupt:
+        # Raised by on_signal() for SIGINT and SIGTERM. Not an error, so
+        # we swallow it rather than printing a traceback at the user.
+        pass
 
-            if root is None:
-                # Not part of the agent tree. We stay out of its way, but we
-                # still log it so we can show what we chose not to touch.
-                verdict, label, reason = FAN_ALLOW, "allow", "not supervised"
-            else:
-                verdict, label, reason = decide(policies, path, root)
-
-            name = name_of_process(pid)
-
-            print("%-8s pid=%-7d %s  ->  %s (%s)" % (
-                name, pid, path, label.upper(), reason))
-
-            # Answer the kernel FIRST so the paused process gets going again.
-            answer(fan_fd, event_fd, verdict)
-            os.close(event_fd)
-
-            # Then record it. Nobody is waiting on this.
-            writer.record(pid, name, path, label, reason)
+    print()
+    print("stopping, flushing the audit log ...")
+    if writer.stop():
+        print("stopped")
+    else:
+        # The writer is still busy and is not a daemon thread, so a normal
+        # exit would wait for it for ever. We gave it its timeout; leave.
+        print("writer did not finish, exiting anyway")
+        os._exit(1)
 
 
 # Guarded so the supervision helpers above can be imported and tested

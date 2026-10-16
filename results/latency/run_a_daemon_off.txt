@@ -1,0 +1,17 @@
+Aegis latency benchmark
+  target  : /home/acerparas/demo/project/src/app.py
+  bursts  : 50 x 10 opens = 500 total
+  pause   : 12 s between bursts (> WINDOW=10s in risk.py)
+  output  : /home/acerparas/aegis/results/latency/raw_a_daemon_off.csv
+
+
+Results
+  ALLOWED opens (500):
+    count  : 500
+    median : 2.5 us
+    p95    : 44.8 us
+    p99    : 125.7 us
+    max    : 652.5 us
+  BLOCKED opens: 0  (risk window stayed clean)
+
+Raw data saved to: /home/acerparas/aegis/results/latency/raw_a_daemon_off.csv
