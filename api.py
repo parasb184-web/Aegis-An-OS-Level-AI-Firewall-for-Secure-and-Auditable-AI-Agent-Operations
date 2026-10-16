@@ -112,6 +112,23 @@ def run(scenario: str):
     return {"started": True, "scenario": scenario, "pid": proc.pid}
 
 
+@app.get("/run")
+def run_state():
+    # The dashboard polls this so its status line cannot go stale. Without it
+    # the browser has no way to tell a finished agent from a running one, and
+    # the status would keep claiming "running" long after the agent exited.
+    #
+    # poll() also reaps the child, so calling it on a schedule stops finished
+    # agents lingering as zombies.
+    with _running_lock:
+        if _running is None:
+            return {"running": False}
+        code = _running.poll()
+        if code is None:
+            return {"running": True, "pid": _running.pid}
+        return {"running": False, "pid": _running.pid, "exit": code}
+
+
 @app.get("/")
 def dashboard():
     return FileResponse("dashboard.html")

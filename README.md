@@ -71,8 +71,13 @@ unsupervised and nothing will be blocked.
 **3. The dashboard**
 
 ```bash
-uvicorn api:app --reload --port 8000
+uvicorn api:app --port 8000
 ```
+
+Do not add `--reload` when you are running scenarios from the dashboard.
+Saving any file makes uvicorn replace the worker process, which resets the
+one-agent-at-a-time guard while the agent it was guarding is still running,
+so a second agent can be started alongside it.
 
 Then open <http://localhost:8000>.
 

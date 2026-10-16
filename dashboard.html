@@ -56,6 +56,7 @@
   .tally { display: flex; align-items: flex-end; gap: 34px; margin: 26px 0 8px; }
   .stat .n { font-size: 34px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat .k { font-size: 11px; color: var(--dim); margin-top: 5px; }
+  .stat .tot { font-size: 10px; color: #5c6572; margin-top: 2px; font-variant-numeric: tabular-nums; }
   .stat.allow .n { color: var(--allow); }
   .stat.warn  .n { color: var(--warn); }
   .stat.block .n { color: var(--block); }
@@ -149,9 +150,9 @@
   </header>
 
   <div class="tally">
-    <div class="stat allow"><div class="n" id="allow">0</div><div class="k">allowed</div></div>
-    <div class="stat warn"><div class="n" id="warn">0</div><div class="k">warned</div></div>
-    <div class="stat block"><div class="n" id="block">0</div><div class="k">blocked</div></div>
+    <div class="stat allow"><div class="n" id="allow">0</div><div class="k">allowed</div><div class="tot" id="allow-tot"></div></div>
+    <div class="stat warn"><div class="n" id="warn">0</div><div class="k">warned</div><div class="tot" id="warn-tot"></div></div>
+    <div class="stat block"><div class="n" id="block">0</div><div class="k">blocked</div><div class="tot" id="block-tot"></div></div>
     <div class="ratio"><i id="bar" style="width:100%"></i><i class="w" id="barw" style="width:0%"></i></div>
   </div>
 
@@ -163,6 +164,8 @@
     <button id="r-normal">Run normal</button>
     <button id="r-credentials">Run credentials</button>
     <button id="r-massread">Run mass read</button>
+    <span class="sep"></span>
+    <button id="reset" title="Count from now on. The audit log is not touched.">Reset counters</button>
     <span class="status" id="runstatus"></span>
   </div>
 
@@ -181,6 +184,26 @@
 
 let filter = "all";
 let paused = false;
+
+// The audit log holds every decision ever made, which on a developer machine
+// means the lifetime totals are enormous and a run of three files does not
+// visibly move them. So the tiles show the count SINCE a baseline, with the
+// lifetime figure underneath. "Reset counters" moves the baseline to now --
+// it deliberately does NOT delete anything. An audit log you can clear from
+// a web page is not an audit log.
+let base = null;
+
+function loadBase() {
+  try {
+    const raw = localStorage.getItem("aegis.base");
+    if (raw) base = JSON.parse(raw);
+  } catch (e) { /* private window or blocked storage: fall back to lifetime */ }
+}
+
+function saveBase() {
+  try { localStorage.setItem("aegis.base", JSON.stringify(base)); } catch (e) {}
+}
+loadBase();
 let seen = new Set();      // paths+times we have already drawn, to flash new ones
 let firstLoad = true;
 
@@ -251,10 +274,24 @@ async function refresh() {
   if (paused) return;
   try {
     const counts = await (await fetch("/counts")).json();
-    const a = counts.allow || 0, w = counts.warn || 0, b = counts.block || 0;
+    const la = counts.allow || 0, lw = counts.warn || 0, lb = counts.block || 0;
+
+    // First sight of the numbers becomes the baseline, so the page starts at
+    // zero and climbs as decisions arrive rather than opening on a huge total.
+    if (base === null) { base = {allow: la, warn: lw, block: lb}; saveBase(); }
+
+    // A reset after rows were archived, or a rebuilt database, can leave the
+    // baseline above the live total. Clamp rather than show negatives.
+    const a = Math.max(0, la - base.allow);
+    const w = Math.max(0, lw - base.warn);
+    const b = Math.max(0, lb - base.block);
+
     document.getElementById("allow").textContent = a;
     document.getElementById("warn").textContent = w;
     document.getElementById("block").textContent = b;
+    document.getElementById("allow-tot").textContent = "of " + la.toLocaleString() + " total";
+    document.getElementById("warn-tot").textContent  = "of " + lw.toLocaleString() + " total";
+    document.getElementById("block-tot").textContent = "of " + lb.toLocaleString() + " total";
     // A warn still opens the file, so it sits on the allowed side of the
     // bar rather than the blocked side -- but in its own colour, because
     // "allowed and worth a look" is not the same as "allowed".
@@ -263,6 +300,20 @@ async function refresh() {
       (total === 0 ? 100 : (a / total) * 100) + "%";
     document.getElementById("barw").style.width =
       (total === 0 ? 0 : (w / total) * 100) + "%";
+
+    // Ask the API whether an agent is actually still running, rather than
+    // trusting what the button said when it was clicked.
+    try {
+      const run = await (await fetch("/run")).json();
+      const status = document.getElementById("runstatus");
+      if (run.running) {
+        status.className = "status busy";
+        status.textContent = "running (pid " + run.pid + ")";
+      } else if (status.classList.contains("busy")) {
+        status.className = "status";
+        status.textContent = run.pid ? "finished (pid " + run.pid + ")" : "";
+      }
+    } catch (e) { /* the counts fetch above already reports connection loss */ }
 
     latest = await (await fetch("/recent")).json();
     draw();
@@ -280,7 +331,7 @@ document.getElementById("f-block").onclick = () => setFilter("block");
 // Starting a scenario is the one thing this page does that is not a read.
 // The API refuses a second run while one is going, so the button only has
 // to report what it was told rather than track state itself.
-async function runScenario(name, button) {
+async function runScenario(name) {
   const status = document.getElementById("runstatus");
   status.className = "status busy";
   status.textContent = "starting " + name + " ...";
@@ -306,8 +357,24 @@ async function runScenario(name, button) {
 }
 
 for (const name of ["normal", "credentials", "massread"]) {
-  document.getElementById("r-" + name).onclick = (e) => runScenario(name, e.target);
+  document.getElementById("r-" + name).onclick = () => runScenario(name);
 }
+
+document.getElementById("reset").onclick = async () => {
+  const status = document.getElementById("runstatus");
+  try {
+    const c = await (await fetch("/counts")).json();
+    base = {allow: c.allow || 0, warn: c.warn || 0, block: c.block || 0};
+    saveBase();
+    seen = new Set();
+    status.className = "status";
+    status.textContent = "counters reset (log untouched)";
+    refresh();
+  } catch (e) {
+    status.className = "status err";
+    status.textContent = "no connection";
+  }
+};
 
 document.getElementById("hold").onclick = (e) => {
   paused = !paused;
