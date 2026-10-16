@@ -50,6 +50,134 @@
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--allow); }
   .dot.stale { background: var(--block); }
 
+  /* the daemon light: gentle pulse while it is alive, solid red when gone */
+  .dmn { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--dim); }
+  .dmn .lamp { width: 9px; height: 9px; border-radius: 50%; background: var(--block); }
+  .dmn.up .lamp { background: var(--allow); animation: breathe 2s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+
+  .tagline {
+    color: var(--dim); font-size: 13px; line-height: 1.55;
+    margin: 10px 0 0; max-width: 72ch;
+  }
+
+  /* captions, hidden when Explain mode is off */
+  .cap { font-size: 11px; color: var(--dim); margin-top: 5px; line-height: 1.4; max-width: 26ch; }
+  body.plain .cap, body.plain .tagline, body.plain .note, body.plain .legend { display: none; }
+
+  /* "?" tooltips. title= alone is too slow and invisible on a projector. */
+  .q {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; margin-left: 5px;
+    border: 1px solid var(--line); border-radius: 50%;
+    font-size: 10px; color: var(--dim); cursor: help;
+    position: relative; vertical-align: middle;
+  }
+  .q:hover { color: var(--text); border-color: var(--dim); }
+  .q .tip {
+    display: none; position: absolute; bottom: 150%; left: 50%;
+    transform: translateX(-50%);
+    background: #0f1115; border: 1px solid var(--line); border-radius: 5px;
+    padding: 8px 10px; width: 260px; font-size: 12px; line-height: 1.45;
+    color: var(--text); text-align: left; z-index: 20;
+    box-shadow: 0 6px 20px rgba(0,0,0,.5);
+  }
+  .q:hover .tip, .q:focus .tip { display: block; }
+
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--dim); margin: 10px 0 2px; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: block; }
+
+  /* ---- risk meter ---------------------------------------------------- */
+  .meterbox { margin: 18px 0 6px; }
+  .meterhead { display: flex; align-items: baseline; gap: 10px; }
+  .meterhead .who { color: var(--dim); font-size: 12px; margin-left: auto; }
+  .meter {
+    height: 16px; border-radius: 8px; background: var(--panel);
+    border: 1px solid var(--line); overflow: hidden; margin-top: 7px; position: relative;
+  }
+  .meter > i {
+    display: block; height: 100%; width: 0;
+    background: var(--allow);
+    transition: width .45s ease, background .45s ease;
+  }
+  .meter.w > i { background: var(--warn); }
+  .meter.b > i { background: var(--block); }
+  .meter.b { animation: thump .5s ease-out; }
+  @keyframes thump { 0% { transform: scale(1) } 40% { transform: scale(1.03) } 100% { transform: scale(1) } }
+  .meterval { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .meterval.w { color: var(--warn); }
+  .meterval.b { color: var(--block); }
+  .blocking {
+    color: var(--block); font-weight: 600; font-size: 12px;
+    letter-spacing: .6px; margin-left: 8px;
+  }
+  .ticks { display: flex; justify-content: space-between; font-size: 10px; color: #5c6572; margin-top: 3px; }
+
+  /* ---- guided tour ----------------------------------------------------- */
+  .tourmask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 50; }
+  .tourmask.on { display: block; }
+  .spot {
+    position: absolute; border: 2px solid var(--allow); border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,.6); pointer-events: none;
+    transition: all .3s ease;
+  }
+  .tourcard {
+    position: absolute; max-width: 330px; z-index: 51;
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 15px 16px; box-shadow: 0 10px 34px rgba(0,0,0,.55);
+  }
+  .tourcard h4 { margin: 0 0 7px; font-size: 14px; }
+  .tourcard p { margin: 0 0 12px; font-size: 13px; color: var(--dim); line-height: 1.5; }
+  .tourcard .act { display: flex; gap: 8px; align-items: center; }
+  .tourcard .step { margin-left: auto; color: var(--dim); font-size: 12px; }
+
+  /* ---- animations on real events ---------------------------------------- */
+  @keyframes slidein { from { opacity: 0; transform: translateY(-8px) } to { opacity: 1; transform: none } }
+  .row.fresh { animation: slidein .28s ease-out; }
+  @keyframes flashblock {
+    0% { background: rgba(224,87,94,.42) } 100% { background: rgba(224,87,94,.06) }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0) } 25% { transform: translateX(-3px) }
+    75% { transform: translateX(3px) }
+  }
+  .row.block.fresh { animation: slidein .28s ease-out, flashblock .55s ease-out, shake .25s ease-in-out; }
+  @keyframes glowwarn {
+    0% { background: rgba(217,160,60,.34) } 100% { background: rgba(217,160,60,.06) }
+  }
+  .row.warn.fresh { animation: slidein .28s ease-out, glowwarn .6s ease-out; }
+
+  .spin {
+    display: inline-block; width: 11px; height: 11px; margin-right: 7px;
+    border: 2px solid var(--line); border-top-color: var(--warn);
+    border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -1px;
+  }
+  @keyframes spin { to { transform: rotate(360deg) } }
+
+  .card.live { border-color: var(--warn); animation: slidein .3s ease-out; }
+  .card .done { font-size: 12px; margin-top: 8px; }
+  .card .done.ok { color: var(--allow); }
+  .card .done.bad { color: var(--block); }
+
+  /* a dot travelling the flow diagram, one per real decision */
+  .flow { position: relative; }
+  .pip {
+    position: absolute; width: 11px; height: 11px; border-radius: 50%;
+    background: var(--allow); top: 50%; margin-top: -5px;
+    transition: left .5s ease; z-index: 3; pointer-events: none;
+    box-shadow: 0 0 10px rgba(78,168,130,.8);
+  }
+  .pip.b { background: var(--block); box-shadow: 0 0 10px rgba(224,87,94,.85); }
+  .pip.w { background: var(--warn); box-shadow: 0 0 10px rgba(217,160,60,.85); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row.fresh, .row.block.fresh, .row.warn.fresh, .card.live, .meter.b { animation: none; }
+    .dmn.up .lamp { animation: none; }
+    .spin { animation: none; border-top-color: var(--line); }
+    .meter > i, .pip, .spot { transition: none; }
+  }
+
   /* ---- tabs ------------------------------------------------------- */
   .tabs { display: flex; gap: 2px; margin-top: 16px; border-bottom: 1px solid var(--line); }
   .tabs button {
@@ -239,8 +367,29 @@
   <header>
     <h1>Aegis</h1>
     <span class="watching">file access decisions</span>
-    <span class="live"><span class="dot" id="dot"></span><span id="pulse">connecting</span></span>
+    <span class="live">
+      <span class="dmn" id="dmn" title="Whether the Aegis daemon is running">
+        <span class="lamp"></span><span id="dmntext">daemon: checking</span>
+      </span>
+      <span class="dot" id="dot"></span><span id="pulse">connecting</span>
+    </span>
   </header>
+
+  <p class="tagline">
+    Watches every file an AI agent tries to open, and blocks the risky ones
+    before they&rsquo;re read.
+  </p>
+
+  <div class="controls" style="margin-top:12px">
+    <button class="ctl" id="explain" aria-pressed="true">Explain mode: on</button>
+    <button class="ctl" id="tourbtn">Take the tour</button>
+    <span class="legend">
+      <span><i style="background:var(--allow)"></i> allowed</span>
+      <span><i style="background:var(--warn)"></i> warned</span>
+      <span><i style="background:var(--block)"></i> blocked</span>
+      <span><i style="background:#49525e"></i> not supervised</span>
+    </span>
+  </div>
 
   <div class="tabs" role="tablist">
     <button id="tab-live"     role="tab" aria-selected="true">Live</button>
@@ -255,24 +404,50 @@
     <div class="tally">
       <button class="stat allow" id="s-allow" aria-pressed="false">
         <div class="n" id="allow">0</div><div class="k">allowed</div><div class="tot" id="allow-tot"></div>
+        <div class="cap">files the agent was allowed to open</div>
       </button>
       <button class="stat warn" id="s-warn" aria-pressed="false">
         <div class="n" id="warn">0</div><div class="k">warned</div><div class="tot" id="warn-tot"></div>
+        <div class="cap">allowed, but the behaviour looked unusual</div>
       </button>
       <button class="stat block" id="s-block" aria-pressed="false">
         <div class="n" id="block">0</div><div class="k">blocked</div><div class="tot" id="block-tot"></div>
+        <div class="cap">refused by a rule or by the risk score</div>
       </button>
       <div class="ratio"><i id="bar" style="width:100%"></i><i class="w" id="barw" style="width:0%"></i></div>
     </div>
 
-    <div class="controls">
+    <div class="meterbox" id="meterbox">
+      <div class="meterhead">
+        <span class="meterval" id="meterval">0</span>
+        <span class="muted">risk score<span class="q" tabindex="0">?<span class="tip">The daemon keeps the last 10 seconds of a supervised agent's opens. More than 15 files scores 40; more than 4 folders scores 30. This number comes from the daemon itself, not the database.</span></span></span>
+        <span class="blocking" id="blocking" style="display:none">BLOCKING</span>
+        <span class="who" id="meterwho"></span>
+      </div>
+      <div class="meter" id="meter"><i id="meterfill"></i></div>
+      <div class="ticks"><span>0</span><span>30 warn</span><span>40 block</span><span>70</span></div>
+      <div class="cap" style="max-width:none">
+        rises when the agent reads many files or folders quickly &middot;
+        30 = warn &middot; 40 = block
+      </div>
+    </div>
+
+    <div class="controls" id="runrow">
       <button class="ctl" id="hold" aria-pressed="false">Pause</button>
       <button class="ctl" id="reset" title="Count from now on. The audit log is not touched.">Reset counters</button>
       <span class="sep"></span>
-      <button class="ctl" id="r-normal">Run normal</button>
-      <button class="ctl" id="r-credentials">Run credentials</button>
-      <button class="ctl" id="r-massread">Run mass read</button>
+      <button class="ctl" id="r-normal"
+        title="Reads 3 files in its own workspace, slowly. Should all be allowed.">Run normal</button>
+      <button class="ctl" id="r-credentials"
+        title="Reads one workspace file, then an SSH private key. The key should be blocked by a rule.">Run credentials</button>
+      <button class="ctl" id="r-massread"
+        title="Reads 80 files fast across 6 folders. Should get blocked after 15.">Run mass read</button>
       <span class="status" id="runstatus"></span>
+    </div>
+    <div class="cap" style="max-width:none">
+      <b>normal</b>: 3 files in its workspace, should all be allowed &middot;
+      <b>credentials</b>: goes for an SSH key, should be blocked by a rule &middot;
+      <b>mass read</b>: reads 80 files fast, should get blocked after 15
     </div>
 
     <div id="breakdown"></div>
@@ -333,12 +508,12 @@
       </div>
       <div class="farrow">&rarr;</div>
       <div class="fstep" id="f3">
-        <div class="n">3</div><div class="t2">Daemon</div>
+        <div class="n">3</div><div class="t2">Daemon<span class="q" tabindex="0">?<span class="tip">Supervised means the process is the registered agent or something it started. Aegis walks /proc up the parent chain to decide. Not supervised means it is some other program, so Aegis allows it untouched and records why.</span></span></div>
         <div class="d">Walks /proc up the parent chain. Not under a registered root means "not supervised": allowed, untouched.</div>
       </div>
       <div class="farrow">&rarr;</div>
       <div class="fstep" id="f4">
-        <div class="n">4</div><div class="t2">Rules + risk</div>
+        <div class="n">4</div><div class="t2">Rules + risk<span class="q" tabindex="0">?<span class="tip">A policy rule matches a path pattern and blocks outright, like SSH keys. The risk score is separate: it looks at the shape of the last 10 seconds of activity, not at any single file.</span></span></div>
         <div class="d">A policy rule can block outright. Otherwise the 10 second window scores the burst: 30 warns, 40 blocks.</div>
       </div>
       <div class="farrow">&rarr;</div>
@@ -356,16 +531,34 @@
       <h3>Why the numbers look the way they do</h3>
       <div class="kv"><span>Risk window</span><span class="n">10 seconds, per supervised process tree</span></div>
       <div class="kv"><span>More than 15 opens in the window</span><span class="n">+40 &rarr; blocked</span></div>
-      <div class="kv"><span>More than 4 distinct folders</span><span class="n">+30 &rarr; warned</span></div>
+      <div class="kv"><span>More than 4 distinct folders<span class="q" tabindex="0">?<span class="tip">A warn opens the file anyway. It only puts the behaviour on the record, so a reviewer can see an agent drifting before anything is refused.</span></span></span><span class="n">+30 &rarr; warned</span></div>
       <div class="kv"><span>Both at once</span><span class="n">70</span></div>
       <div class="note">
         Only 0, 30, 40 and 70 are reachable, which is why the warn threshold
         is 30: it is the one score that can land between allowed and blocked.
       </div>
+      <div class="kv" style="margin-top:10px">
+        <span>If the daemon stops<span class="q" tabindex="0">?<span class="tip">Aegis fails open. When the daemon is gone the kernel stops asking it, so files that would be refused are simply opened, and nothing is recorded. Measured: after kill -9, the 35th read of an SSH key succeeded.</span></span></span>
+        <span class="n">files are allowed, nothing recorded</span>
+      </div>
     </div>
   </div>
 
 </div>
+
+<div class="tourmask" id="tourmask">
+  <div class="spot" id="spot"></div>
+  <div class="tourcard" id="tourcard">
+    <h4 id="tourtitle"></h4>
+    <p id="tourtext"></p>
+    <div class="act">
+      <button class="ctl" id="tourskip">Skip</button>
+      <button class="ctl" id="tournext">Next</button>
+      <span class="step" id="tourstep"></span>
+    </div>
+  </div>
+</div>
+
 <script>
 // The page only reads. Every decision shown here was already made by the
 // daemon and written to PostgreSQL. Nothing on this page is computed from
@@ -381,6 +574,8 @@ let tab = "live";
 let verdictFilter = null;      // "allow" | "warn" | "block" | null
 let openSession = null;        // pid whose detail is expanded
 let openRule = null;           // note of the rule whose rows are shown
+let runningScenario = null;    // scenario we started, until the API says it ended
+let runningPid = null;         // its pid, so its session card can be marked
 
 // The audit log holds every decision ever made, so on a developer machine the
 // lifetime totals are enormous and a run of three files does not visibly move
@@ -401,12 +596,48 @@ function saveBase() {
 }
 loadBase();
 
+// Explain mode shows every caption and tooltip. Turning it off leaves a
+// clean view for someone who already knows the system. On by default,
+// because the usual reader of this page is seeing it for the first time.
+let explain = true;
+try {
+  const v = localStorage.getItem("aegis.explain");
+  if (v === "off") explain = false;
+} catch (e) {}
+
+function applyExplain() {
+  document.body.classList.toggle("plain", !explain);
+  const b = document.getElementById("explain");
+  b.setAttribute("aria-pressed", explain);
+  b.textContent = "Explain mode: " + (explain ? "on" : "off");
+}
+
 // Paths come out of the filesystem and go into innerHTML, so they have to be
 // escaped. A file called <b>x</b> would otherwise rewrite the page.
 function esc(s) {
   return String(s === null || s === undefined ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+// Counters count up to their new value instead of jumping, so a run of 80
+// files reads as movement rather than a number swap. The animation only ever
+// walks towards a real figure from the API.
+const shown = {allow: 0, warn: 0, block: 0};
+function countTo(id, target) {
+  const from = shown[id];
+  if (from === target) return;
+  shown[id] = target;
+  const el = document.getElementById(id);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce || Math.abs(target - from) > 400) { el.textContent = target; return; }
+  const t0 = performance.now();
+  const step = (t) => {
+    const k = Math.min(1, (t - t0) / 420);
+    el.textContent = Math.round(from + (target - from) * k);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 function ago(hhmmss) {
@@ -442,8 +673,12 @@ async function api(path) {
 // ---- drawing rows ----------------------------------------------------
 // Every view that lists decisions uses this, so a row looks and behaves the
 // same whether it came from the live feed, a session, a rule or a file.
-function rowsHtml(rows, flash) {
-  if (!rows.length) return '<div class="empty">Nothing to show.</div>';
+function rowsHtml(rows, flash, emptyMsg) {
+  if (!rows.length) {
+    return '<div class="empty">' +
+      (emptyMsg || "Nothing yet. Click <b>Run normal</b> to start a demo agent.") +
+      '</div>';
+  }
   let out = "";
   for (const r of rows) {
     const key = r.time + r.path + r.verdict;
@@ -464,7 +699,9 @@ function rowsHtml(rows, flash) {
 
 function drawFeed() {
   const rows = verdictFilter ? latest.filter(r => r.verdict === verdictFilter) : latest;
-  document.getElementById("rows").innerHTML = rowsHtml(rows, true);
+  document.getElementById("rows").innerHTML = rowsHtml(rows, true,
+    verdictFilter ? "No " + verdictFilter + " decisions recorded yet."
+                  : "Nothing yet. Start the daemon, then click <b>Run normal</b>.");
   document.getElementById("feednote").textContent = verdictFilter
     ? "Showing " + verdictFilter + " decisions only. Click the counter again to clear."
     : "";
@@ -576,18 +813,28 @@ async function drawSessions() {
   try {
     const list = await api("/sessions");
     if (!list.length) { box.innerHTML = '<div class="empty">No runs recorded yet.</div>'; return; }
-    box.innerHTML = list.map(s =>
-      '<button class="card" data-session="' + s.pid + '" aria-pressed="' +
+    box.innerHTML = list.map(s => {
+      const live = (runningPid === s.pid);
+      // A tick or a cross once the run is over: blocked anything, or clean.
+      const done = live ? '' :
+        '<div class="done ' + (s.block ? 'bad' : 'ok') + '">' +
+        (s.block ? '\u2718 ' + s.block + ' refused' : '\u2714 nothing refused') +
+        '</div>';
+      return '<button class="card' + (live ? ' live' : '') +
+        '" data-session="' + s.pid + '" aria-pressed="' +
         (openSession === s.pid) + '">' +
-        '<div class="sc">' + esc(s.scenario) + '</div>' +
-        '<div class="meta">pid ' + s.pid + ' &middot; ' + esc(s.started) +
+        '<div class="sc">' + esc(s.scenario) +
+          (live ? ' <span class="spin"></span>' : '') + '</div>' +
+        '<div class="meta">' + (live ? 'Running\u2026 &middot; ' : '') +
+          'pid ' + s.pid + ' &middot; ' + esc(s.started) +
           (s.supervised ? '' : ' &middot; unsupervised') + '</div>' +
         '<div class="tags">' +
           '<span class="tag-a"><b>' + s.allow + '</b> allowed</span>' +
           '<span class="tag-w"><b>' + s.warn + '</b> warned</span>' +
           '<span class="tag-b"><b>' + s.block + '</b> blocked</span>' +
-        '</div>' +
-      '</button>').join("");
+        '</div>' + done +
+      '</button>';
+    }).join("");
   } catch (e) {
     box.innerHTML = '<div class="empty">Could not load sessions.</div>';
   }
@@ -744,8 +991,21 @@ for (const t of ["live", "sessions", "rules", "how"]) {
 // Starting a scenario is the one thing this page does that is not a read.
 // The API refuses a second run while one is going, so the button only has to
 // report what it was told rather than track state itself.
+let spinning = null;            // id of the button currently showing a spinner
+
+function setSpinner(name, on) {
+  const b = document.getElementById("r-" + name);
+  if (!b) return;
+  const label = {normal: "Run normal", credentials: "Run credentials",
+                 massread: "Run mass read"}[name];
+  b.innerHTML = on ? '<span class="spin"></span>' + label : label;
+  b.disabled = !!on;
+  spinning = on ? name : null;
+}
+
 async function runScenario(name) {
   const status = document.getElementById("runstatus");
+  setSpinner(name, true);
   status.className = "status busy";
   status.textContent = "starting " + name + " ...";
   try {
@@ -753,19 +1013,23 @@ async function runScenario(name) {
     if (!res.ok) {
       status.className = "status err";
       status.textContent = "error: " + res.status;
+      setSpinner(name, false);
       return;
     }
     const body = await res.json();
     if (body.started) {
       status.className = "status busy";
       status.textContent = "running " + name + " (pid " + body.pid + ")";
+      runningScenario = name;
     } else {
       status.className = "status err";
       status.textContent = body.reason || "could not start";
+      setSpinner(name, false);
     }
   } catch (e) {
     status.className = "status err";
     status.textContent = "no connection";
+    setSpinner(name, false);
   }
 }
 for (const name of ["normal", "credentials", "massread"]) {
@@ -798,6 +1062,93 @@ document.getElementById("hold").onclick = (e) => {
   e.target.textContent = paused ? "Resume" : "Pause";
 };
 
+// ---- the daemon's own state: heartbeat and live risk window --------------
+// Everything here comes from the file the daemon publishes each second. The
+// risk score exists nowhere else: the database only records a score once a
+// row has already been blocked or warned.
+let lastScore = 0;
+let blockingShown = false;
+
+async function refreshDaemon() {
+  let d;
+  try {
+    d = await api("/daemon");
+  } catch (e) {
+    d = {running: false, agents: []};
+  }
+
+  const box = document.getElementById("dmn");
+  box.classList.toggle("up", !!d.running);
+  document.getElementById("dmntext").textContent =
+    d.running ? "daemon: running" : "daemon: stopped";
+  box.title = d.running
+    ? "The daemon is running and answering the kernel."
+    : "The daemon is not running. Aegis fails open: files that would be "
+      + "refused are opened, and nothing is recorded.";
+
+  // The meter follows whichever supervised agent is currently riskiest.
+  const agents = d.agents || [];
+  let top = null;
+  for (const a of agents) if (!top || a.score > top.score) top = a;
+
+  const score = top ? top.score : 0;
+  const pct = Math.min(100, (score / 70) * 100);
+  const meter = document.getElementById("meter");
+  const val = document.getElementById("meterval");
+
+  document.getElementById("meterfill").style.width = pct + "%";
+  val.textContent = score;
+  meter.classList.remove("w", "b");
+  val.classList.remove("w", "b");
+  if (score >= 40) { meter.classList.add("b"); val.classList.add("b"); }
+  else if (score >= 30) { meter.classList.add("w"); val.classList.add("w"); }
+
+  // Pulse once on the way through 40 rather than every second it stays there.
+  const crossed = score >= 40 && lastScore < 40;
+  document.getElementById("blocking").style.display = score >= 40 ? "" : "none";
+  if (crossed) {
+    meter.classList.remove("b");
+    void meter.offsetWidth;          // restart the keyframe
+    meter.classList.add("b");
+  }
+  lastScore = score;
+
+  document.getElementById("meterwho").textContent = top
+    ? top.name + " " + top.root + " \u00b7 " + top.files + " files, "
+      + top.folders + " folders in the last " + (d.window || 10) + "s"
+    : (d.running ? "no supervised agent right now" : "");
+}
+
+// ---- a dot travels the flow for each real decision -----------------------
+let pipSeen = null;
+function movePip(rows) {
+  if (!rows.length) return;
+  const newest = rows[0];
+  const key = newest.time + newest.path + newest.verdict;
+  if (key === pipSeen) return;        // only move on a decision we have not drawn
+  pipSeen = key;
+
+  const flow = document.querySelector(".flow");
+  if (!flow || flow.offsetParent === null) return;   // tab not visible
+
+  let pip = document.getElementById("pip");
+  if (!pip) {
+    pip = document.createElement("div");
+    pip.id = "pip"; pip.className = "pip";
+    flow.appendChild(pip);
+  }
+  // An unsupervised open is never judged, so its dot stops at step 3.
+  const lastStep = newest.reason === "not supervised" ? "f3" : "f6";
+  pip.className = "pip" + (newest.verdict === "block" ? " b"
+                        : newest.verdict === "warn" ? " w" : "");
+  const start = document.getElementById("f1").offsetLeft;
+  pip.style.left = start + "px";
+  const end = document.getElementById(lastStep);
+  requestAnimationFrame(() => {
+    pip.style.left = (end.offsetLeft + end.offsetWidth - 11) + "px";
+  });
+}
+
 // ---- the poller ----------------------------------------------------------
 async function refresh() {
   if (paused) return;
@@ -815,9 +1166,9 @@ async function refresh() {
     const w = Math.max(0, lw - base.warn);
     const b = Math.max(0, lb - base.block);
 
-    document.getElementById("allow").textContent = a;
-    document.getElementById("warn").textContent = w;
-    document.getElementById("block").textContent = b;
+    countTo("allow", a);
+    countTo("warn", w);
+    countTo("block", b);
     document.getElementById("allow-tot").textContent = "of " + la.toLocaleString() + " total";
     document.getElementById("warn-tot").textContent  = "of " + lw.toLocaleString() + " total";
     document.getElementById("block-tot").textContent = "of " + lb.toLocaleString() + " total";
@@ -836,12 +1187,20 @@ async function refresh() {
     try {
       const run = await api("/run");
       const status = document.getElementById("runstatus");
+      runningPid = run.running ? run.pid : null;
       if (run.running) {
         status.className = "status busy";
-        status.textContent = "running (pid " + run.pid + ")";
-      } else if (status.classList.contains("busy")) {
-        status.className = "status";
-        status.textContent = run.pid ? "finished (pid " + run.pid + ")" : "";
+        status.textContent = "running " + (runningScenario || "") +
+                             " (pid " + run.pid + ")";
+      } else {
+        // The agent has exited, so stop the spinner whatever the button said.
+        if (spinning) setSpinner(spinning, false);
+        if (status.classList.contains("busy")) {
+          status.className = "status";
+          status.textContent = run.pid
+            ? (runningScenario || "run") + " finished (pid " + run.pid + ")" : "";
+        }
+        runningScenario = null;
       }
     } catch (e) { /* the counts fetch above already reports connection loss */ }
 
@@ -852,6 +1211,7 @@ async function refresh() {
       drawFeed();
     }
     highlightFlow(latest);
+    movePip(latest);
     if (tab === "sessions" && openSession === null) drawSessions();
 
     document.getElementById("dot").classList.remove("stale");
@@ -862,8 +1222,81 @@ async function refresh() {
   }
 }
 
+// ---- explain mode + tour wiring ------------------------------------------
+applyExplain();
+document.getElementById("explain").onclick = () => {
+  explain = !explain;
+  try { localStorage.setItem("aegis.explain", explain ? "on" : "off"); } catch (e) {}
+  applyExplain();
+};
+
+// A short tour of the five things worth knowing. The spotlight is drawn over
+// a real element each step, so it cannot drift out of date as the page grows.
+const TOUR = [
+  {el: ".tally", title: "The three outcomes",
+   text: "Every file the agent opens ends up in one of these. Click any counter to filter the list below and see what drove that number."},
+  {el: "#meterbox", title: "The risk score",
+   text: "This comes from the daemon itself, live. It rises as an agent reads many files or folders quickly. At 30 it warns, at 40 it refuses."},
+  {el: "#runrow", title: "Run a demo agent",
+   text: "Three scripted agents. 'normal' behaves; 'credentials' goes for an SSH key; 'mass read' tries to read 80 files and gets stopped partway."},
+  {el: ".feed", title: "Every decision, as it happens",
+   text: "Green allowed, amber warned, red blocked. Click a file path to see every decision ever made about it, or a process to see whether it was supervised."},
+  {el: "#tab-sessions", title: "Look back at a run",
+   text: "The Sessions tab replays a run step by step and marks exactly where the score crossed 30 and 40."},
+];
+
+let tourAt = -1;
+function showTourStep(i) {
+  const mask = document.getElementById("tourmask");
+  if (i < 0 || i >= TOUR.length) {
+    mask.classList.remove("on");
+    tourAt = -1;
+    try { localStorage.setItem("aegis.tour", "seen"); } catch (e) {}
+    return;
+  }
+  tourAt = i;
+  const s = TOUR[i];
+  const el = document.querySelector(s.el);
+  mask.classList.add("on");
+  document.getElementById("tourtitle").textContent = s.title;
+  document.getElementById("tourtext").textContent = s.text;
+  document.getElementById("tourstep").textContent = (i + 1) + " of " + TOUR.length;
+  document.getElementById("tournext").textContent =
+    i === TOUR.length - 1 ? "Done" : "Next";
+
+  const spot = document.getElementById("spot");
+  const card = document.getElementById("tourcard");
+  if (!el) { spot.style.display = "none"; return; }
+  spot.style.display = "block";
+  const r = el.getBoundingClientRect();
+  const pad = 8;
+  spot.style.top = (window.scrollY + r.top - pad) + "px";
+  spot.style.left = (window.scrollX + r.left - pad) + "px";
+  spot.style.width = (r.width + pad * 2) + "px";
+  spot.style.height = (r.height + pad * 2) + "px";
+  // Place the card below the highlight, or above it if that would run off.
+  const below = window.scrollY + r.bottom + 16;
+  card.style.left = Math.max(16, window.scrollX + r.left) + "px";
+  card.style.top = (below + 190 > window.scrollY + window.innerHeight
+                    ? window.scrollY + r.top - 180 : below) + "px";
+}
+
+document.getElementById("tournext").onclick = () => showTourStep(tourAt + 1);
+document.getElementById("tourskip").onclick = () => showTourStep(TOUR.length);
+document.getElementById("tourbtn").onclick = () => showTourStep(0);
+document.getElementById("tourmask").onclick = (e) => {
+  if (e.target.id === "tourmask") showTourStep(TOUR.length);
+};
+
+// First visit only. Wrapped because storage throws in a private window.
+let tourSeen = false;
+try { tourSeen = localStorage.getItem("aegis.tour") === "seen"; } catch (e) {}
+if (!tourSeen) setTimeout(() => showTourStep(0), 700);
+
 refresh();
+refreshDaemon();
 setInterval(refresh, 1000);
+setInterval(refreshDaemon, 1000);
 </script>
 </body>
 </html>
