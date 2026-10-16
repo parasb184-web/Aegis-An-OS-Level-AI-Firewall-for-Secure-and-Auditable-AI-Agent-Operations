@@ -37,6 +37,9 @@ FLUSH_SECONDS = 2
 # Seconds to wait after a DB error before reconnecting.
 RETRY_WAIT = 3
 
+# How long stop() waits for the thread to finish its final flush.
+STOP_TIMEOUT = 10
+
 
 def record(pid, process_name, path, verdict, reason):
     # Called by the daemon on every intercepted open. Must return immediately.
@@ -78,6 +81,26 @@ def writer_loop():
                         conn.rollback()
                     except Exception:
                         pass
+
+                    # The main loop retries a failed flush, but this path used
+                    # to give up and drop the batch, which is exactly the loss
+                    # stop() exists to prevent. Reconnect once and try again.
+                    # No RETRY_WAIT here: shutdown should be prompt, and the
+                    # common case is a stale connection rather than a database
+                    # that is actually down.
+                    try:
+                        conn.close()
+                    except Exception:
+                        pass
+                    try:
+                        conn = db.connect()
+                        cur = conn.cursor()
+                        write_batch(cur, batch)
+                        conn.commit()
+                        print('[writer] shutdown flush succeeded after reconnect.')
+                    except Exception as e2:
+                        print('[writer] shutdown flush failed again: ' + str(e2))
+                        print('[writer] ' + str(len(batch)) + ' rows lost.')
             return
 
         if item is not None:
@@ -136,7 +159,7 @@ def start():
     return _thread
 
 
-def stop():
+def stop(timeout=STOP_TIMEOUT):
     # Tell the writer thread to flush remaining rows and exit, then wait.
     # The daemon must call this on SIGINT/SIGTERM before sys.exit() so that
     # rows already on the queue are not lost.
@@ -144,9 +167,18 @@ def stop():
     # What this still cannot protect against: kill -9, OOM kill, or a power
     # cut. In those cases the queue is in memory and is gone. A write-ahead
     # log on disk would be needed to survive those scenarios.
+    # Returns True if the thread finished and flushed, False if it was still
+    # running when the timeout expired. The caller has to decide what to do
+    # then, because this is not a daemon thread and a normal interpreter exit
+    # would wait for it for ever.
     decisions.put(_STOP)
-    if _thread is not None:
-        _thread.join()
+    if _thread is None:
+        return True
+    _thread.join(timeout)
+    if _thread.is_alive():
+        print('[writer] did not finish within ' + str(timeout) + ' s.')
+        return False
+    return True
 
 
 if __name__ == '__main__':
