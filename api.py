@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 import subprocess
@@ -27,12 +28,9 @@ _running_lock = threading.Lock()
 
 @app.get("/counts")
 def counts():
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute("SELECT verdict, n FROM verdict_counts")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    with cursor() as cur:
+        cur.execute("SELECT verdict, n FROM verdict_counts")
+        rows = cur.fetchall()
 
     result = {"allow": 0, "block": 0, "warn": 0}
     for verdict, count in rows:
@@ -42,14 +40,11 @@ def counts():
 
 @app.get("/recent")
 def recent():
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT ts, process_name, path, verdict, reason "
-        "FROM actions ORDER BY id DESC LIMIT 50")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    with cursor() as cur:
+        cur.execute(
+            "SELECT ts, process_name, path, verdict, reason "
+            "FROM actions ORDER BY id DESC LIMIT 50")
+        rows = cur.fetchall()
 
     out = []
     for ts, process_name, path, verdict, reason in rows:
@@ -92,6 +87,17 @@ def run(scenario: str):
     return {"started": True, "scenario": scenario, "pid": proc.pid}
 
 
+@contextlib.contextmanager
+def cursor():
+    conn = db.connect()
+    cur = conn.cursor()
+    try:
+        yield cur
+    finally:
+        cur.close()
+        conn.close()
+
+
 def rows_to_dicts(cur):
     out = []
     for ts, process_name, path, verdict, reason, pid in cur.fetchall():
@@ -117,123 +123,104 @@ def by_verdict(verdict: str):
     if verdict not in ("allow", "warn", "block"):
         raise HTTPException(status_code=400, detail="unknown verdict")
 
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute("SELECT " + ROW_COLS + " FROM actions WHERE verdict = %s AND "
-                + NOT_SYNTHETIC + " ORDER BY id DESC LIMIT 100", (verdict, SYNTHETIC))
-    rows = rows_to_dicts(cur)
+    with cursor() as cur:
+        cur.execute("SELECT " + ROW_COLS + " FROM actions WHERE verdict = %s AND "
+                    + NOT_SYNTHETIC + " ORDER BY id DESC LIMIT 100", (verdict, SYNTHETIC))
+        rows = rows_to_dicts(cur)
 
-    cur.execute("SELECT path, count(*) FROM actions WHERE verdict = %s AND "
-                + NOT_SYNTHETIC + " GROUP BY path ORDER BY 2 DESC LIMIT 5",
-                (verdict, SYNTHETIC))
-    top_files = [{"path": p, "n": n} for p, n in cur.fetchall()]
+        cur.execute("SELECT path, count(*) FROM actions WHERE verdict = %s AND "
+                    + NOT_SYNTHETIC + " GROUP BY path ORDER BY 2 DESC LIMIT 5",
+                    (verdict, SYNTHETIC))
+        top_files = [{"path": p, "n": n} for p, n in cur.fetchall()]
 
-    cur.execute("SELECT reason, count(*) FROM actions WHERE verdict = %s AND "
-                + NOT_SYNTHETIC + " GROUP BY reason ORDER BY 2 DESC LIMIT 5",
-                (verdict, SYNTHETIC))
-    top_reasons = [{"reason": r, "n": n} for r, n in cur.fetchall()]
-
-    cur.close()
-    conn.close()
+        cur.execute("SELECT reason, count(*) FROM actions WHERE verdict = %s AND "
+                    + NOT_SYNTHETIC + " GROUP BY reason ORDER BY 2 DESC LIMIT 5",
+                    (verdict, SYNTHETIC))
+        top_reasons = [{"reason": r, "n": n} for r, n in cur.fetchall()]
     return {"verdict": verdict, "rows": rows,
             "top_files": top_files, "top_reasons": top_reasons}
 
 
 @app.get("/sessions")
 def sessions():
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT pid, min(process_name), min(ts), max(ts), count(*),"
-        "       count(*) FILTER (WHERE verdict='allow'),"
-        "       count(*) FILTER (WHERE verdict='warn'),"
-        "       count(*) FILTER (WHERE verdict='block'),"
-        "       count(*) FILTER (WHERE path LIKE %s),"
-        "       count(*) FILTER (WHERE path LIKE %s),"
-        "       count(*) FILTER (WHERE reason = 'not supervised') "
-        "FROM actions WHERE " + NOT_SYNTHETIC + " "
-        "GROUP BY pid ORDER BY min(ts) DESC LIMIT 40",
-        ("%/.ssh/%", "%/notes/%", SYNTHETIC))
+    with cursor() as cur:
+        cur.execute(
+            "SELECT pid, min(process_name), min(ts), max(ts), count(*),"
+            "       count(*) FILTER (WHERE verdict='allow'),"
+            "       count(*) FILTER (WHERE verdict='warn'),"
+            "       count(*) FILTER (WHERE verdict='block'),"
+            "       count(*) FILTER (WHERE path LIKE %s),"
+            "       count(*) FILTER (WHERE path LIKE %s),"
+            "       count(*) FILTER (WHERE reason = 'not supervised') "
+            "FROM actions WHERE " + NOT_SYNTHETIC + " "
+            "GROUP BY pid ORDER BY min(ts) DESC LIMIT 40",
+            ("%/.ssh/%", "%/notes/%", SYNTHETIC))
 
-    out = []
-    for (pid, proc, lo, hi, n, a, w, b, ssh, notes, unsup) in cur.fetchall():
-        if notes:
-            scenario = "massread"
-        elif ssh:
-            scenario = "credentials"
-        elif n <= 5:
-            scenario = "normal"
-        else:
-            scenario = "unknown"
-        out.append({
-            "pid": pid, "process": proc, "scenario": scenario,
-            "started": lo.strftime("%H:%M:%S"), "ended": hi.strftime("%H:%M:%S"),
-            "total": n, "allow": a, "warn": w, "block": b,
-            "supervised": unsup == 0,
-        })
-    cur.close()
-    conn.close()
+        out = []
+        for (pid, proc, lo, hi, n, a, w, b, ssh, notes, unsup) in cur.fetchall():
+            if notes:
+                scenario = "massread"
+            elif ssh:
+                scenario = "credentials"
+            elif n <= 5:
+                scenario = "normal"
+            else:
+                scenario = "unknown"
+            out.append({
+                "pid": pid, "process": proc, "scenario": scenario,
+                "started": lo.strftime("%H:%M:%S"), "ended": hi.strftime("%H:%M:%S"),
+                "total": n, "allow": a, "warn": w, "block": b,
+                "supervised": unsup == 0,
+            })
     return out
 
 
 @app.get("/session/{pid}")
 def session(pid: int):
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute("SELECT " + ROW_COLS + " FROM actions WHERE pid = %s AND "
-                + NOT_SYNTHETIC + " ORDER BY id", (pid, SYNTHETIC))
-    rows = rows_to_dicts(cur)
-    cur.close()
-    conn.close()
+    with cursor() as cur:
+        cur.execute("SELECT " + ROW_COLS + " FROM actions WHERE pid = %s AND "
+                    + NOT_SYNTHETIC + " ORDER BY id", (pid, SYNTHETIC))
+        rows = rows_to_dicts(cur)
     return {"pid": pid, "rows": rows}
 
 
 @app.get("/rules")
 def rules():
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute("SELECT id, path_pattern, sensitivity, action, note "
-                "FROM policies ORDER BY CASE action WHEN 'block' THEN 0 ELSE 1 END, id")
-    rules = cur.fetchall()
+    with cursor() as cur:
+        cur.execute("SELECT id, path_pattern, sensitivity, action, note "
+                    "FROM policies ORDER BY CASE action WHEN 'block' THEN 0 ELSE 1 END, id")
+        rules = cur.fetchall()
 
-    cur.execute("SELECT reason, count(*) FROM actions WHERE " + NOT_SYNTHETIC +
-                " GROUP BY reason", (SYNTHETIC,))
-    fired = dict(cur.fetchall())
+        cur.execute("SELECT reason, count(*) FROM actions WHERE " + NOT_SYNTHETIC +
+                    " GROUP BY reason", (SYNTHETIC,))
+        fired = dict(cur.fetchall())
 
-    out = []
-    for rid, pattern, sens, action, note in rules:
-        out.append({"id": rid, "pattern": pattern, "sensitivity": sens,
-                    "action": action, "note": note, "fired": fired.get(note, 0)})
+        out = []
+        for rid, pattern, sens, action, note in rules:
+            out.append({"id": rid, "pattern": pattern, "sensitivity": sens,
+                        "action": action, "note": note, "fired": fired.get(note, 0)})
 
-    out_other = [{"reason": r, "n": n} for r, n in fired.items()
-                 if r not in [x["note"] for x in out]]
-    cur.close()
-    conn.close()
+        out_other = [{"reason": r, "n": n} for r, n in fired.items()
+                     if r not in [x["note"] for x in out]]
     return {"rules": out, "other": sorted(out_other, key=lambda x: -x["n"])}
 
 
 @app.get("/history")
 def history(path: str):
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute("SELECT " + ROW_COLS + " FROM actions WHERE path = %s "
-                "ORDER BY id DESC LIMIT 200", (path,))
-    rows = rows_to_dicts(cur)
-    cur.close()
-    conn.close()
+    with cursor() as cur:
+        cur.execute("SELECT " + ROW_COLS + " FROM actions WHERE path = %s "
+                    "ORDER BY id DESC LIMIT 200", (path,))
+        rows = rows_to_dicts(cur)
     return {"path": path, "rows": rows}
 
 
 @app.get("/process/{pid}")
 def process(pid: int):
-    conn = db.connect()
-    cur = conn.cursor()
-    cur.execute("SELECT count(*), count(*) FILTER (WHERE reason='not supervised'),"
-                "       min(process_name), min(ts), max(ts) "
-                "FROM actions WHERE pid = %s AND " + NOT_SYNTHETIC, (pid, SYNTHETIC))
-    total, unsup, proc, lo, hi = cur.fetchone()
-    cur.close()
-    conn.close()
+    with cursor() as cur:
+        cur.execute("SELECT count(*), count(*) FILTER (WHERE reason='not supervised'),"
+                    "       min(process_name), min(ts), max(ts) "
+                    "FROM actions WHERE pid = %s AND " + NOT_SYNTHETIC, (pid, SYNTHETIC))
+        total, unsup, proc, lo, hi = cur.fetchone()
 
     chain = []
     walk = pid
