@@ -1,23 +1,3 @@
-# Measures how much latency the Aegis daemon adds to a file open().
-#
-# The process being judged is frozen by the kernel while the daemon answers,
-# so every microsecond the daemon spends thinking is dead time for the agent.
-# This script asks: is that cost acceptable? Does it stay stable under load?
-#
-# Risk-window problem: risk.py blocks after FILE_LIMIT (15) opens inside
-# WINDOW (10 s). If we opened 2000 times in a tight loop, open 16 would get
-# a DENY and we would time denials, not allow decisions. To avoid mixing
-# results we open in bursts of BURST_SIZE (strictly less than FILE_LIMIT),
-# sleep BURST_PAUSE seconds (more than WINDOW) between bursts so history
-# expires, and record whether each open was allowed or blocked separately.
-#
-# Usage:
-#   python3 bench/latency.py --target ~/demo/project/src/app.py --bursts 50
-#   python3 bench/latency.py --target ~/demo/noop.txt --bursts 50
-#
-# Run once with daemon OFF (case a), twice with daemon ON (cases b and c).
-# Compare the three CSV files in results/latency/.
-
 import argparse
 import csv
 import os
@@ -25,8 +5,8 @@ import statistics
 import sys
 import time
 
-BURST_SIZE = 10    # must be < risk.py FILE_LIMIT (15)
-BURST_PAUSE = 12.0 # must be > risk.py WINDOW (10 s)
+BURST_SIZE = 10
+BURST_PAUSE = 12.0
 
 
 def parse_args():
@@ -44,9 +24,6 @@ def parse_args():
 
 
 def open_and_time(path):
-    # os.open() is the raw POSIX call that fanotify intercepts.
-    # Python built-in open() calls it underneath but adds buffering setup
-    # that widens the interval -- we measure just the syscall round-trip.
     t0 = time.perf_counter_ns()
     try:
         fd = os.open(path, os.O_RDONLY)
@@ -55,8 +32,6 @@ def open_and_time(path):
         return t1 - t0, 'allowed'
     except PermissionError:
         t1 = time.perf_counter_ns()
-        # Daemon returned FAN_DENY. Record separately so blocked opens
-        # never distort the allowed-open latency numbers.
         return t1 - t0, 'blocked'
     except OSError as e:
         print('ERROR opening ' + path + ': ' + str(e), file=sys.stderr)
@@ -68,7 +43,6 @@ def ns_to_us(ns):
 
 
 def percentile(sorted_data, pct):
-    # Nearest-rank percentile. sorted_data must be sorted ascending.
     if not sorted_data:
         return float('nan')
     idx = min(int(len(sorted_data) * pct / 100), len(sorted_data) - 1)
@@ -98,7 +72,6 @@ def main():
 
     label = args.label or os.path.basename(target).replace('.', '_')
 
-    # results/latency/ is two levels up from bench/
     out_dir = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         'results', 'latency')

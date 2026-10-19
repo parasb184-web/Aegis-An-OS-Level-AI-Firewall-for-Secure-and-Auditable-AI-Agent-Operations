@@ -1,10 +1,3 @@
-# Aegis daemon.
-#
-# Sits between a process and the files it opens. Linux pauses the open and
-# asks us; we check the rules and answer allow or deny. Every decision is
-# recorded, but only AFTER we have answered, so the paused process is not
-# waiting on a database write.
-
 import ctypes
 import json
 import os
@@ -30,22 +23,12 @@ FAN_DENY           = 0x02
 AT_FDCWD = -100
 O_RDONLY = 0
 
-# Where run_agent.sh and the dashboard register the agent they just started.
 DEFAULT_ROOTS = "/tmp/aegis_roots"
 
-# How often we re-read that file and forget processes that have exited.
-# Doing it per open would cost a stat for every cached pid; once a second
-# is often enough and keeps the work off the hot path.
 SWEEP_SECONDS = 1.0
 
-# A parent chain this long means something is wrong; stop rather than spin.
 MAX_DEPTH = 40
 
-# Where we publish what we are doing, so the dashboard can show a live risk
-# score and tell whether we are still alive. The risk window lives in this
-# process's memory and is never written to the database -- the database only
-# records a score once a row has already been blocked or warned -- so without
-# this file there is no honest way to show a score that rises.
 DEFAULT_STATUS = "/tmp/aegis_status.json"
 
 EVENT_FORMAT = "<IBBHQii"
@@ -92,39 +75,29 @@ def name_of_process(pid):
         return "<gone>"
 
 
-# Which processes are the agent.
-#
-# We are told the pid of one process (the root) and we supervise it and
-# everything it starts. For each open we walk up the parent chain: reach a
-# root and this is the agent, reach init first and it is somebody else.
+status_path = None
+watching = None
+roots_file = None
 
-status_path = None       # where we publish our state, set in main()
-watching = None          # the folder we were pointed at, for the status file
-roots_file = None        # the roots file we were told to read
-
-roots = set()            # pids we supervise, plus everything beneath them
-supervised_cache = {}    # pid -> the root supervising it, or None
-roots_mtime = -1.0       # mtime of the roots file when we last read it
+roots = set()
+supervised_cache = {}
+roots_mtime = -1.0
 last_sweep = 0.0
 
 
 def parent_of(pid):
-    # The 4th field of /proc/<pid>/stat is the parent pid. The 2nd field is
-    # the program name in brackets and it can itself contain spaces and
-    # brackets, so we count fields from the LAST closing bracket instead of
-    # splitting the whole line.
     try:
         with open("/proc/%d/stat" % pid) as f:
             line = f.read()
     except OSError:
-        return 0                      # it exited while we were walking
+        return 0
     close = line.rfind(")")
     if close < 0:
         return 0
     fields = line[close + 1:].split()
     if len(fields) < 2:
         return 0
-    return int(fields[1])             # fields[0] is the state letter
+    return int(fields[1])
 
 
 def alive(pid):
@@ -132,8 +105,6 @@ def alive(pid):
 
 
 def read_roots_file(path):
-    # A missing file is not an error. It only means nothing has registered
-    # itself yet, which is the normal state before the first agent starts.
     found = set()
     try:
         with open(path) as f:
@@ -147,19 +118,12 @@ def read_roots_file(path):
 
 
 def refresh_roots(path):
-    # One stat per event. This has to run on every open, not on the slower
-    # sweep below: an agent registers itself and starts reading immediately,
-    # and anything we miss in between would go unsupervised.
-    #
-    # Pids only ever flow IN from the file. The agent runs as our user and
-    # could delete its own line to escape, so the file is an inbox, never
-    # the current truth. Roots are released in sweep(), by death alone.
     global roots_mtime
 
     try:
         mtime = os.path.getmtime(path)
     except OSError:
-        return                        # nothing registered yet
+        return
     if mtime == roots_mtime:
         return
     roots_mtime = mtime
@@ -167,15 +131,10 @@ def refresh_roots(path):
     for pid in read_roots_file(path):
         if pid not in roots:
             roots.add(pid)
-            # Anything we previously decided was unsupervised may now sit
-            # under this new root, so the old answers cannot be trusted.
             supervised_cache.clear()
 
 
 def sweep(path):
-    # The expensive half: one stat per pid we are tracking. Once a second is
-    # soon enough to notice a process has exited, and keeps that cost off
-    # the path that every open waits on.
     global roots_mtime, last_sweep
 
     now = time.time()
@@ -188,24 +147,16 @@ def sweep(path):
             roots.discard(pid)
             risk.forget(pid)
 
-    # Drop cached answers for pids that are gone, so a pid the kernel hands
-    # out again does not inherit the answer we gave the previous owner.
     for pid in list(supervised_cache):
         if not alive(pid):
             del supervised_cache[pid]
 
-    # Re-read next time even if the mtime looks unchanged, in case two
-    # registrations landed inside the same filesystem timestamp tick.
     roots_mtime = -1.0
 
     publish_status()
 
 
 def publish_status():
-    # A heartbeat plus the current risk window per supervised root. Written
-    # whole to a temporary file and renamed, so a reader never sees half a
-    # file. Failures are ignored: publishing is for the dashboard's benefit
-    # and must never take the daemon down.
     if not status_path:
         return
 
@@ -240,16 +191,13 @@ def publish_status():
         fd, tmp = tempfile.mkstemp(dir=os.path.dirname(status_path) or ".")
         with os.fdopen(fd, "w") as f:
             json.dump(state, f)
-        os.chmod(tmp, 0o644)        # the API runs as the user, we run as root
+        os.chmod(tmp, 0o644)
         os.replace(tmp, status_path)
     except OSError:
         pass
 
 
 def supervising_root(pid):
-    # Returns the root that supervises this pid, or None if it is not part
-    # of the agent. Cached because this runs on every single open and a walk
-    # costs one small file read per step.
     if pid in supervised_cache:
         return supervised_cache[pid]
 
@@ -270,12 +218,8 @@ def supervising_root(pid):
 def decide(policies, path, root):
     action, note = db.check(policies, path)
 
-    # Keep the history up to date whatever the rules say, so the score
-    # sees everything the agent touched.
     risk.record(root, path)
 
-    # A hard rule wins outright. We do not want a well-behaved agent to
-    # earn its way into credentials by looking calm first.
     if action == "block":
         return FAN_DENY, "block", note
 
@@ -284,8 +228,6 @@ def decide(policies, path, root):
     if risk.is_risky(points):
         return FAN_DENY, "block", "risk %d: %s" % (points, why)
 
-    # Medium risk still opens the file. We only want it on the record, so a
-    # reviewer can see the agent drifting before anything gets refused.
     if risk.is_warning(points):
         return FAN_ALLOW, "warn", "risk %d: %s" % (points, why)
 
@@ -295,10 +237,6 @@ def decide(policies, path, root):
     return FAN_ALLOW, "allow", "no rule"
 
 def on_signal(signum, frame):
-    # Signal handlers run in the main thread, so raising from here unblocks
-    # the os.read() in main(). Returning normally would not: the kernel
-    # restarts an interrupted read, so we would not react to Ctrl+C until the
-    # next file open happened to arrive.
     raise KeyboardInterrupt
 
 
@@ -315,8 +253,6 @@ def main():
     roots_path = DEFAULT_ROOTS
     status = DEFAULT_STATUS
 
-    # Two optional flags, in any order. A loop rather than argparse keeps the
-    # whole of this file readable without knowing a library.
     rest = sys.argv[2:]
     while rest:
         if rest[0] == "--roots" and len(rest) > 1:
@@ -334,8 +270,6 @@ def main():
 
     fan_fd = start_fanotify()
 
-    # FAN_EVENT_ON_CHILD only reaches files directly inside a marked folder,
-    # not subfolders. So we walk the tree and mark every folder we find.
     marked = 0
     for folder_path, dirs, files in os.walk(folder):
         watch_folder(fan_fd, folder_path)
@@ -349,12 +283,8 @@ def main():
     status_path = status
     watching = folder
     roots_file = roots_path
-    publish_status()            # so the dashboard lights up straight away
+    publish_status()
 
-    # From here on the writer thread holds audit rows in memory, so every
-    # exit path has to go through writer.stop(). It is not a daemon thread
-    # any more, so skipping that would hang the process instead of losing
-    # the rows.
     signal.signal(signal.SIGINT, on_signal)
     signal.signal(signal.SIGTERM, on_signal)
 
@@ -390,8 +320,6 @@ def main():
                 root = supervising_root(pid)
 
                 if root is None:
-                    # Not part of the agent tree. We stay out of its way, but we
-                    # still log it so we can show what we chose not to touch.
                     verdict, label, reason = FAN_ALLOW, "allow", "not supervised"
                 else:
                     verdict, label, reason = decide(policies, path, root)
@@ -401,20 +329,14 @@ def main():
                 print("%-8s pid=%-7d %s  ->  %s (%s)" % (
                     name, pid, path, label.upper(), reason))
 
-                # Answer the kernel FIRST so the paused process gets going again.
                 answer(fan_fd, event_fd, verdict)
                 os.close(event_fd)
 
-                # Then record it. Nobody is waiting on this.
                 writer.record(pid, name, path, label, reason)
 
     except KeyboardInterrupt:
-        # Raised by on_signal() for SIGINT and SIGTERM. Not an error, so
-        # we swallow it rather than printing a traceback at the user.
         pass
 
-    # Remove the status file so the dashboard shows us as stopped at once,
-    # rather than waiting for the heartbeat to look stale.
     try:
         os.remove(status_path)
     except OSError:
@@ -425,13 +347,9 @@ def main():
     if writer.stop():
         print("stopped")
     else:
-        # The writer is still busy and is not a daemon thread, so a normal
-        # exit would wait for it for ever. We gave it its timeout; leave.
         print("writer did not finish, exiting anyway")
         os._exit(1)
 
 
-# Guarded so the supervision helpers above can be imported and tested
-# without starting the daemon, which needs root.
 if __name__ == "__main__":
     main()

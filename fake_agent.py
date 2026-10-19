@@ -1,13 +1,3 @@
-# A script that pretends to be an AI coding agent.
-#
-# It is NOT a real AI agent. It just opens files in the same patterns a real
-# one would, so we can test whether Aegis reacts correctly. Three scenarios,
-# run separately so each can be shown on its own during a demo.
-#
-#   python3 fake_agent.py normal
-#   python3 fake_agent.py credentials
-#   python3 fake_agent.py massread
-
 import os
 import sys
 import time
@@ -17,8 +7,6 @@ DEMO = os.path.join(HOME, "demo")
 
 
 def read_file(path):
-    # We do not care what is in the file. We only care that opening it
-    # makes the kernel ask Aegis for permission.
     try:
         f = open(path)
         f.read()
@@ -31,8 +19,6 @@ def read_file(path):
 
 
 def normal():
-    # What a well behaved agent does: a few files, inside its own workspace,
-    # with pauses in between like it is thinking.
     print("scenario: normal work")
     for name in ["src/app.py", "src/utils.py", "src/app.py"]:
         read_file(os.path.join(DEMO, "project", name))
@@ -40,7 +26,6 @@ def normal():
 
 
 def credentials():
-    # The agent has been misled and goes for something outside its job.
     print("scenario: credential access")
     read_file(os.path.join(DEMO, "project", "src/app.py"))
     time.sleep(1)
@@ -48,8 +33,6 @@ def credentials():
 
 
 def massread():
-    # Enumerating everything it can reach, across several folders. Each open
-    # looks fine on its own. Only the rate and the spread give it away.
     print("scenario: mass file read")
     folders = ["notes", "notes/a", "notes/b", "notes/c", "notes/d", "notes/e"]
     for folder in folders:

@@ -1,23 +1,13 @@
-# Scores how risky the agent's recent behaviour looks.
-#
-# The point: we cannot see a mass file read coming. Each open arrives on its
-# own, and on the first one there is nothing to notice. So instead of judging
-# one file, we keep a short history and look at the shape of it.
-
 import os
 import time
 
 
-WINDOW = 10.0        # seconds of history we keep
-FILE_LIMIT = 15      # opens in the window before it looks like enumeration
-FOLDER_LIMIT = 4     # distinct folders before it looks like wandering
-WARN_AT = 30         # score that gets an operation logged but still allowed
-BLOCK_AT = 40        # score that gets an operation refused
+WINDOW = 10.0
+FILE_LIMIT = 15
+FOLDER_LIMIT = 4
+WARN_AT = 30
+BLOCK_AT = 40
 
-# One history per supervised root, each a list of (when, which folder).
-# The whole agent tree shares a single window on purpose: if every process
-# had its own, an agent could stay under the limit by forking a few children
-# and splitting the reads between them.
 history = {}
 
 
@@ -28,9 +18,6 @@ def record(root, path):
 
 
 def trim(now):
-    # Drop opens that have aged out, then drop roots left with nothing, so
-    # the dict cannot grow for ever. There are only ever a handful of roots,
-    # so sweeping all of them is cheaper than tracking which need attention.
     cutoff = now - WINDOW
     for root in list(history):
         opens = history[root]
@@ -41,12 +28,10 @@ def trim(now):
 
 
 def forget(root):
-    # Called by the daemon when a root's process has exited.
     history.pop(root, None)
 
 
 def score(root):
-    # Called after record(), so the current open is already counted.
     opens = history.get(root, [])
     files = len(opens)
     folders = len(set(folder for when, folder in opens))
@@ -66,8 +51,6 @@ def score(root):
 
 
 def is_warning(points):
-    # Scoring only ever produces 0, 30, 40 or 70, so 30 is the one value
-    # that can land here: wandering across folders without reading fast.
     return WARN_AT <= points < BLOCK_AT
 
 
@@ -76,7 +59,6 @@ def is_risky(points):
 
 
 if __name__ == "__main__":
-    # Quick check without the daemon: pretend an agent reads 30 files fast.
     for i in range(30):
         p = "/home/test/notes/file%d.txt" % i
         record(1234, p)
