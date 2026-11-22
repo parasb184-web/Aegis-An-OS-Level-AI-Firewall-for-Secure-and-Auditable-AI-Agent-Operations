@@ -1,10 +1,8 @@
 import fnmatch
 import psycopg2
 
-# Public API surface of this module
 __all__ = ["connect", "load_policies", "check"]
 
-# Default PostgreSQL DSN — override with the AEGIS_DB environment variable
 DB = "dbname=aegis user=aegis password=aegis host=localhost"
 
 

@@ -2,10 +2,8 @@ import os
 import time
 from typing import Dict, List, Optional, Tuple
 
-# Public API surface of this module
 __all__ = ["record", "trim", "forget", "score", "is_warning", "is_risky"]
 
-# Sliding window in seconds over which file-open events are counted
 WINDOW: float = 10.0
 
 FILE_LIMIT: int = 15      
