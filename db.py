@@ -1,58 +1,33 @@
-"""Aegis Database Layer: PostgreSQL connection management and policy engine.
-
-Loads firewall rules from the 'policies' table and provides wildcard pattern
-matching against filesystem paths.
-"""
-
 import fnmatch
-import os
-from typing import List, Optional, Tuple
 import psycopg2
-from psycopg2.extensions import connection as PgConnection
+
+# Public API surface of this module
+__all__ = ["connect", "load_policies", "check"]
+
+# Default PostgreSQL DSN — override with the AEGIS_DB environment variable
+DB = "dbname=aegis user=aegis password=aegis host=localhost"
 
 
-# Database connection string, configurable via AEGIS_DB environment variable
-DB: str = os.environ.get(
-    "AEGIS_DB",
-    "dbname=aegis user=aegis password=aegis host=localhost"
-)
-
-
-def connect() -> PgConnection:
-    """Establish and return a new PostgreSQL connection."""
+def connect():
     return psycopg2.connect(DB)
 
 
-def load_policies() -> List[Tuple[str, str, str, Optional[str]]]:
-    """Load active firewall policies ordered so that block actions take precedence.
-    
-    Translates SQL '%' wildcards into fnmatch '*' pattern wildcards.
-    """
+def load_policies():
     conn = connect()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT path_pattern, sensitivity, action, note FROM policies "
-        "ORDER BY CASE action WHEN 'block' THEN 0 ELSE 1 END, id"
-    )
+    cur.execute("SELECT path_pattern, sensitivity, action, note FROM policies "
+                "ORDER BY CASE action WHEN 'block' THEN 0 ELSE 1 END, id")
     rows = cur.fetchall()
     cur.close()
     conn.close()
 
-    policies: List[Tuple[str, str, str, Optional[str]]] = []
+    policies = []
     for pattern, sensitivity, action, note in rows:
         policies.append((pattern.replace("%", "*"), sensitivity, action, note))
     return policies
 
 
-def check(
-    policies: List[Tuple[str, str, str, Optional[str]]],
-    path: str
-) -> Tuple[Optional[str], Optional[str]]:
-    """Match a filesystem path against loaded policies in priority order.
-    
-    Returns:
-        (action, note) if a pattern matches, otherwise (None, None).
-    """
+def check(policies, path):
     for pattern, sensitivity, action, note in policies:
         if fnmatch.fnmatch(path, pattern):
             return action, note

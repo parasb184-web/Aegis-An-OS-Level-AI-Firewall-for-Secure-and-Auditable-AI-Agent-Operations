@@ -1,25 +1,32 @@
-"""Aegis Demo Agent Simulation.
+"""
+fake_agent.py — Demo AI agent for Aegis firewall testing.
 
-Simulates agent filesystem activity across three distinct operational profiles:
-  1. normal:      Standard developer activity within authorized workspace.
-  2. credentials: Malicious attempt to read private SSH keys / cloud secrets.
-  3. massread:    Rapid bulk exfiltration attempt across multiple directories.
+Simulates three realistic agent behaviours:
+  normal      — reads a small set of project source files (benign).
+  credentials — reads a source file then attempts to open an SSH private key.
+  massread    — iterates over many note files across several subdirectories.
+
+Usage:
+    python3 fake_agent.py [normal|credentials|massread]
+
+The daemon intercepts these file-open calls via fanotify and logs verdicts.
 """
 
 import os
 import sys
 import time
-from typing import Callable, Dict
 
-HOME: str = os.path.expanduser("~")
-DEMO: str = os.path.join(HOME, "demo")
+# Base directory for all demo file operations
+HOME = os.path.expanduser("~")
+DEMO = os.path.join(HOME, "demo")
 
 
-def read_file(path: str) -> None:
-    """Attempt to open and read a target file, handling permission verdicts."""
+def read_file(path):
+    """Attempt to open and read a file, printing the outcome."""
     try:
-        with open(path) as f:
-            f.read()
+        f = open(path)
+        f.read()
+        f.close()
         print("  read    %s" % path)
     except PermissionError:
         print("  BLOCKED %s" % path)
@@ -27,24 +34,24 @@ def read_file(path: str) -> None:
         print("  failed  %s (%s)" % (path, e))
 
 
-def normal() -> None:
-    """Execute benign developer agent workflow reading workspace source files."""
+def normal():
+    """Read a small set of project source files — represents benign agent work."""
     print("scenario: normal work")
     for name in ["src/app.py", "src/utils.py", "src/app.py"]:
         read_file(os.path.join(DEMO, "project", name))
         time.sleep(1.5)
 
 
-def credentials() -> None:
-    """Execute credential access scenario targeting private SSH keys."""
+def credentials():
+    """Access a project file then attempt to read an SSH key — triggers block policy."""
     print("scenario: credential access")
     read_file(os.path.join(DEMO, "project", "src/app.py"))
     time.sleep(1)
     read_file(os.path.join(DEMO, ".ssh", "id_rsa"))
 
 
-def massread() -> None:
-    """Execute high-velocity multi-directory scan to trigger risk rate-limits."""
+def massread():
+    """Enumerate and read files across many note subdirectories — triggers risk engine."""
     print("scenario: mass file read")
     folders = ["notes", "notes/a", "notes/b", "notes/c", "notes/d", "notes/e"]
     for folder in folders:
@@ -58,16 +65,11 @@ def massread() -> None:
                 time.sleep(0.05)
 
 
-scenarios: Dict[str, Callable[[], None]] = {
-    "normal": normal,
-    "credentials": credentials,
-    "massread": massread,
-}
+scenarios = {"normal": normal, "credentials": credentials, "massread": massread}
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in scenarios:
-        print("usage: python3 fake_agent.py [normal|credentials|massread]")
-        sys.exit(1)
+if len(sys.argv) != 2 or sys.argv[1] not in scenarios:
+    print("usage: python3 fake_agent.py [normal|credentials|massread]")
+    sys.exit(1)
 
-    scenarios[sys.argv[1]]()
-    print("done")
+scenarios[sys.argv[1]]()
+print("done")
