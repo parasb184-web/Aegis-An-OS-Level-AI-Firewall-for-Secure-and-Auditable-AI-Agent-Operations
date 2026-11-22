@@ -131,3 +131,4 @@ PostgreSQL maintains pre-computed metrics to ensure instant dashboard updates:
 - Table `actions`: Stores full immutable audit log.
 - Table `verdict_counts`: Maintained by trigger `actions_count_verdict`. Every insert into `actions` increments `verdict_counts.n` in the same transaction.
 - Guarantees $O(1)$ dashboard tally polling without full table scans.
+

@@ -47,3 +47,4 @@ echo "[Aegis] Demo environment initialized successfully."
 echo "  - Workspace:   $TARGET/project/src"
 echo "  - Credentials: $TARGET/.ssh"
 echo "  - Notes:       $TARGET/notes/{a,b,c,d,e}"
+

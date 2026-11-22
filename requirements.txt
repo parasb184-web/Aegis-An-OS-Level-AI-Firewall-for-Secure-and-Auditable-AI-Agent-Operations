@@ -6,3 +6,4 @@ uvicorn>=0.20.0
 
 # PostgreSQL database driver
 psycopg2-binary>=2.9.0
+
