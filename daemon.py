@@ -1,44 +1,62 @@
+"""Aegis Kernel Firewall Monitoring Daemon.
+
+Uses Linux fanotify in permission mode (FAN_OPEN_PERM) to intercept file open
+events across monitored directories. Evaluates process trees against PostgreSQL
+security policies and the dynamic sliding-window risk engine before responding to
+the Linux kernel with FAN_ALLOW or FAN_DENY.
+"""
+
 import ctypes
 import json
 import os
 import signal
 import struct
 import sys
-import time
 import tempfile
-import risk
+import time
+from typing import Any, Dict, List, Optional, Set, Tuple
+
 import db
+import risk
 import writer
 
 libc = ctypes.CDLL("libc.so.6", use_errno=True)
 
-FAN_CLOEXEC        = 0x00000001
-FAN_CLASS_CONTENT  = 0x00000004
-FAN_OPEN_PERM      = 0x00010000
-FAN_EVENT_ON_CHILD = 0x08000000
-FAN_MARK_ADD       = 0x00000001
-FAN_ALLOW          = 0x01
-FAN_DENY           = 0x02
+# Linux fanotify bit flags
+FAN_CLOEXEC: int        = 0x00000001  # Set close-on-exec flag on new file descriptor
+FAN_CLASS_CONTENT: int  = 0x00000004  # Permission events before access; content inspection
+FAN_OPEN_PERM: int      = 0x00010000  # File open permission event (blocks until answered)
+FAN_EVENT_ON_CHILD: int = 0x08000000  # Include child directory events
+FAN_MARK_ADD: int       = 0x00000001  # Add directory to fanotify watch list
 
-AT_FDCWD = -100
-O_RDONLY = 0
+# Kernel response verdicts
+FAN_ALLOW: int          = 0x01        # Grant permission to open file
+FAN_DENY: int           = 0x02        # Deny open with EPERM
 
-DEFAULT_ROOTS = "/tmp/aegis_roots"
+AT_FDCWD: int           = -100        # Special fd for current working directory
+O_RDONLY: int           = 0
 
-SWEEP_SECONDS = 1.0
+DEFAULT_ROOTS: str      = "/tmp/aegis_roots"
+SWEEP_SECONDS: float    = 1.0
+MAX_DEPTH: int          = 40
+DEFAULT_STATUS: str     = "/tmp/aegis_status.json"
 
-MAX_DEPTH = 40
-
-DEFAULT_STATUS = "/tmp/aegis_status.json"
-
-EVENT_FORMAT = "<IBBHQii"
+# Binary struct format for struct fanotify_event_metadata:
+# < (little endian) I (event_len) B (vers) B (reserved) H (metadata_len) Q (mask) i (fd) i (pid)
+EVENT_FORMAT: str       = "<IBBHQii"
 
 libc.fanotify_init.argtypes = [ctypes.c_uint, ctypes.c_uint]
-libc.fanotify_mark.argtypes = [ctypes.c_int, ctypes.c_uint, ctypes.c_uint64,
-                               ctypes.c_int, ctypes.c_char_p]
+libc.fanotify_mark.argtypes = [
+    ctypes.c_int,
+    ctypes.c_uint,
+    ctypes.c_uint64,
+    ctypes.c_int,
+    ctypes.c_char_p,
+]
 
 
-def start_fanotify():
+def start_fanotify() -> int:
+    """Initialize fanotify in permission mode (requires CAP_SYS_ADMIN)."""
     fan_fd = libc.fanotify_init(FAN_CLOEXEC | FAN_CLASS_CONTENT, O_RDONLY)
     if fan_fd < 0:
         err = ctypes.get_errno()
@@ -51,23 +69,30 @@ def start_fanotify():
     return fan_fd
 
 
-def watch_folder(fan_fd, folder):
-    result = libc.fanotify_mark(fan_fd, FAN_MARK_ADD,
-                                FAN_OPEN_PERM | FAN_EVENT_ON_CHILD,
-                                AT_FDCWD, folder.encode())
+def watch_folder(fan_fd: int, folder: str) -> None:
+    """Mark a directory path for child permission event interception."""
+    result = libc.fanotify_mark(
+        fan_fd,
+        FAN_MARK_ADD,
+        FAN_OPEN_PERM | FAN_EVENT_ON_CHILD,
+        AT_FDCWD,
+        folder.encode(),
+    )
     if result < 0:
         print("fanotify_mark failed:", os.strerror(ctypes.get_errno()))
         sys.exit(1)
 
 
-def path_of(fd):
+def path_of(fd: int) -> str:
+    """Resolve file path associated with the event file descriptor."""
     try:
         return os.readlink("/proc/self/fd/%d" % fd)
     except OSError:
         return "<unknown>"
 
 
-def name_of_process(pid):
+def name_of_process(pid: int) -> str:
+    """Read the executable name of a process from /proc/<pid>/comm."""
     try:
         with open("/proc/%d/comm" % pid) as f:
             return f.read().strip()
@@ -75,17 +100,18 @@ def name_of_process(pid):
         return "<gone>"
 
 
-status_path = None
-watching = None
-roots_file = None
+status_path: Optional[str] = None
+watching: Optional[str] = None
+roots_file: Optional[str] = None
 
-roots = set()
-supervised_cache = {}
-roots_mtime = -1.0
-last_sweep = 0.0
+roots: Set[int] = set()
+supervised_cache: Dict[int, Optional[int]] = {}
+roots_mtime: float = -1.0
+last_sweep: float = 0.0
 
 
-def parent_of(pid):
+def parent_of(pid: int) -> int:
+    """Extract parent PID (PPID) by reading /proc/<pid>/stat."""
     try:
         with open("/proc/%d/stat" % pid) as f:
             line = f.read()
@@ -100,12 +126,14 @@ def parent_of(pid):
     return int(fields[1])
 
 
-def alive(pid):
+def alive(pid: int) -> bool:
+    """Check if process directory still exists in /proc."""
     return os.path.exists("/proc/%d" % pid)
 
 
-def read_roots_file(path):
-    found = set()
+def read_roots_file(path: str) -> Set[int]:
+    """Parse agent root PIDs from the shared roots registry file."""
+    found: Set[int] = set()
     try:
         with open(path) as f:
             for line in f:
@@ -117,7 +145,8 @@ def read_roots_file(path):
     return found
 
 
-def refresh_roots(path):
+def refresh_roots(path: str) -> None:
+    """Check file modification time and reload agent roots when updated."""
     global roots_mtime
 
     try:
@@ -134,7 +163,8 @@ def refresh_roots(path):
             supervised_cache.clear()
 
 
-def sweep(path):
+def sweep(path: str) -> None:
+    """Prune terminated root PIDs and refresh heartbeat status."""
     global roots_mtime, last_sweep
 
     now = time.time()
@@ -152,11 +182,11 @@ def sweep(path):
             del supervised_cache[pid]
 
     roots_mtime = -1.0
-
     publish_status()
 
 
-def publish_status():
+def publish_status() -> None:
+    """Write daemon heartbeat and active agent status atomically to status JSON."""
     if not status_path:
         return
 
@@ -197,31 +227,37 @@ def publish_status():
         pass
 
 
-def supervising_root(pid):
+def supervising_root(pid: int) -> Optional[int]:
+    """Walk up parent chain to discover if process descends from an agent root."""
     if pid in supervised_cache:
         return supervised_cache[pid]
 
-    answer = None
+    result = None
     walk = pid
     depth = 0
     while walk > 1 and depth < MAX_DEPTH:
         if walk in roots:
-            answer = walk
+            result = walk
             break
         walk = parent_of(walk)
         depth = depth + 1
 
-    supervised_cache[pid] = answer
-    return answer
+    supervised_cache[pid] = result
+    return result
 
 
-def decide(policies, path, root):
+def decide(
+    policies: List[Tuple[str, str, str, Optional[str]]],
+    path: str,
+    root: int
+) -> Tuple[int, str, str]:
+    """Evaluate target path against database policies and risk score."""
     action, note = db.check(policies, path)
 
     risk.record(root, path)
 
     if action == "block":
-        return FAN_DENY, "block", note
+        return FAN_DENY, "block", note or "blocked by policy"
 
     points, why = risk.score(root)
 
@@ -232,19 +268,23 @@ def decide(policies, path, root):
         return FAN_ALLOW, "warn", "risk %d: %s" % (points, why)
 
     if action == "allow":
-        return FAN_ALLOW, "allow", note
+        return FAN_ALLOW, "allow", note or "allowed by policy"
 
     return FAN_ALLOW, "allow", "no rule"
 
-def on_signal(signum, frame):
+
+def on_signal(signum: int, frame: Any) -> None:
+    """Handle termination signals cleanly."""
     raise KeyboardInterrupt
 
 
-def answer(fan_fd, event_fd, verdict):
+def answer(fan_fd: int, event_fd: int, verdict: int) -> None:
+    """Respond to Linux fanotify kernel with permission verdict struct."""
     os.write(fan_fd, struct.pack("<iI", event_fd, verdict))
 
 
-def main():
+def main() -> None:
+    """Main fanotify event loop."""
     if len(sys.argv) < 2:
         print("usage: sudo python3 daemon.py <folder> [--roots <file>]")
         sys.exit(1)
@@ -256,9 +296,11 @@ def main():
     rest = sys.argv[2:]
     while rest:
         if rest[0] == "--roots" and len(rest) > 1:
-            roots_path = rest[1]; rest = rest[2:]
+            roots_path = rest[1]
+            rest = rest[2:]
         elif rest[0] == "--status" and len(rest) > 1:
-            status = rest[1]; rest = rest[2:]
+            status = rest[1]
+            rest = rest[2:]
         else:
             print("usage: sudo python3 daemon.py <folder> "
                   "[--roots <file>] [--status <file>]")
