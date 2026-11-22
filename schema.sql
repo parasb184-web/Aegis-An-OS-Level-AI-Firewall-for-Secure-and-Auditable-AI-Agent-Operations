@@ -1,35 +1,23 @@
--- Aegis database schema
--- Apply with: psql -U aegis -d aegis -f schema.sql
-
--- ---------------------------------------------------------------------------
--- policies: rule table — which file-path patterns are sensitive and what to do
--- ---------------------------------------------------------------------------
 CREATE TABLE policies (
     id            SERIAL PRIMARY KEY,
-    path_pattern  TEXT NOT NULL,   -- glob pattern matched against accessed paths
-    sensitivity   TEXT NOT NULL,   -- 'high' | 'low'
-    action        TEXT NOT NULL,   -- 'block' | 'warn' | 'allow'
-    note          TEXT             -- human-readable rule label shown in dashboard
+    path_pattern  TEXT NOT NULL,   
+    sensitivity   TEXT NOT NULL,  
+    action        TEXT NOT NULL,   
+    note          TEXT             
 );
 
--- ---------------------------------------------------------------------------
--- actions: audit log — every file-open decision the daemon records
--- ---------------------------------------------------------------------------
 CREATE TABLE actions (
     id             SERIAL PRIMARY KEY,
-    ts             TIMESTAMP NOT NULL DEFAULT now(),   -- wall-clock time of event
-    pid            INTEGER NOT NULL,                   -- process ID of the agent
-    process_name   TEXT,                               -- e.g. "python3"
-    path           TEXT NOT NULL,                      -- absolute path accessed
-    operation      TEXT NOT NULL DEFAULT 'open',       -- currently always 'open'
-    verdict        TEXT NOT NULL,                      -- 'allow' | 'warn' | 'block'
-    reason         TEXT,                               -- matched rule note or risk reason
-    parent_action  INTEGER REFERENCES actions(id)      -- reserved for future chaining
+    ts             TIMESTAMP NOT NULL DEFAULT now(),  
+    pid            INTEGER NOT NULL,                  
+    process_name   TEXT,                               
+    path           TEXT NOT NULL,                      
+    operation      TEXT NOT NULL DEFAULT 'open',       
+    verdict        TEXT NOT NULL,                      
+    reason         TEXT,                               
+    parent_action  INTEGER REFERENCES actions(id)     
 );
 
--- Running count per verdict, so the dashboard does not scan the whole log.
--- Kept up to date by the trigger below, in the same transaction as each
--- insert, so it can never disagree with actions.
 CREATE TABLE verdict_counts (
     verdict  TEXT PRIMARY KEY,
     n        BIGINT NOT NULL DEFAULT 0
@@ -63,7 +51,6 @@ CREATE TRIGGER policies_notify
     AFTER INSERT OR UPDATE OR DELETE ON policies
     FOR EACH STATEMENT EXECUTE FUNCTION notify_policies_changed();
 
--- Starting rules.
 INSERT INTO policies (path_pattern, sensitivity, action, note) VALUES
   ('/home/%/.ssh/%',     'high', 'block', 'SSH private keys'),
   ('/home/%/.aws/%',     'high', 'block', 'cloud credentials'),

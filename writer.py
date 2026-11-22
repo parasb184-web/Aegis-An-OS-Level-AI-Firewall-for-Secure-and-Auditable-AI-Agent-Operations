@@ -5,7 +5,6 @@ from typing import Any, List, Optional, Tuple
 
 import db
 
-# Public API surface of this module
 __all__ = ["record", "start", "stop", "decisions"]
 
 _STOP: object = object()
