@@ -1,26 +1,15 @@
-"""Aegis Risk Engine: Short-term sliding-window rate tracking.
-
-Calculates behavioral risk scores based on file open velocity and directory
-dispersion within a rolling time window.
-"""
-
 import os
 import time
 from typing import Dict, List, Optional, Tuple
 
 
-# Sliding window duration in seconds
 WINDOW: float = 10.0
 
-# Behavioral thresholds for anomaly detection
-FILE_LIMIT: int = 15      # Max acceptable file opens per WINDOW
-FOLDER_LIMIT: int = 4     # Max acceptable unique directories per WINDOW
+FILE_LIMIT: int = 15      
+FOLDER_LIMIT: int = 4     
+WARN_AT: int = 30        
+BLOCK_AT: int = 40       
 
-# Risk score verdict boundaries
-WARN_AT: int = 30         # Threshold for logging a warning
-BLOCK_AT: int = 40        # Threshold for blocking access
-
-# State: maps agent root PID to a list of (timestamp, directory) records
 history: Dict[int, List[Tuple[float, str]]] = {}
 
 
