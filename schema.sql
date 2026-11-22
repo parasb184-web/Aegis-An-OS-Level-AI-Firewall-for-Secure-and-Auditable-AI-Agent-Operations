@@ -1,25 +1,30 @@
 -- Aegis database schema
+-- Apply with: psql -U aegis -d aegis -f schema.sql
 
--- The rules. Which paths are sensitive and what to do about them.
+-- ---------------------------------------------------------------------------
+-- policies: rule table — which file-path patterns are sensitive and what to do
+-- ---------------------------------------------------------------------------
 CREATE TABLE policies (
     id            SERIAL PRIMARY KEY,
-    path_pattern  TEXT NOT NULL,
-    sensitivity   TEXT NOT NULL,
-    action        TEXT NOT NULL,
-    note          TEXT
+    path_pattern  TEXT NOT NULL,   -- glob pattern matched against accessed paths
+    sensitivity   TEXT NOT NULL,   -- 'high' | 'low'
+    action        TEXT NOT NULL,   -- 'block' | 'warn' | 'allow'
+    note          TEXT             -- human-readable rule label shown in dashboard
 );
 
--- Every decision the daemon makes.
+-- ---------------------------------------------------------------------------
+-- actions: audit log — every file-open decision the daemon records
+-- ---------------------------------------------------------------------------
 CREATE TABLE actions (
     id             SERIAL PRIMARY KEY,
-    ts             TIMESTAMP NOT NULL DEFAULT now(),
-    pid            INTEGER NOT NULL,
-    process_name   TEXT,
-    path           TEXT NOT NULL,
-    operation      TEXT NOT NULL DEFAULT 'open',
-    verdict        TEXT NOT NULL,
-    reason         TEXT,
-    parent_action  INTEGER REFERENCES actions(id)
+    ts             TIMESTAMP NOT NULL DEFAULT now(),   -- wall-clock time of event
+    pid            INTEGER NOT NULL,                   -- process ID of the agent
+    process_name   TEXT,                               -- e.g. "python3"
+    path           TEXT NOT NULL,                      -- absolute path accessed
+    operation      TEXT NOT NULL DEFAULT 'open',       -- currently always 'open'
+    verdict        TEXT NOT NULL,                      -- 'allow' | 'warn' | 'block'
+    reason         TEXT,                               -- matched rule note or risk reason
+    parent_action  INTEGER REFERENCES actions(id)      -- reserved for future chaining
 );
 
 -- Running count per verdict, so the dashboard does not scan the whole log.
