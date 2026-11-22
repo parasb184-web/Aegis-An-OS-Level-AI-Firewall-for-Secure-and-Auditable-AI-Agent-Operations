@@ -1,11 +1,4 @@
-# Insert cost with and without the verdict_counts trigger, done the way
-# writer.py does it: one INSERT per row, commit every 50 rows.
-#
-# Uses actions_exp (same columns as actions, 2M rows) because these rows
-# really commit, and we do not want 120,000 fake rows on the live dashboard.
-# Needs sql/generate_dataset.sql and sql/trigger_cost.sql to have run.
-#
-#   python3 sql/insert_bench.py > results/db/task5_python.txt
+
 
 import os
 import statistics
@@ -44,7 +37,6 @@ conn = db.connect()
 cur = conn.cursor()
 results = {"trigger_on": [], "trigger_off": []}
 
-# Alternate on/off each round so slow drift affects both equally.
 for r in range(1, ROUNDS + 1):
     for name in ["trigger_on", "trigger_off"]:
         set_trigger(cur, name == "trigger_on")
@@ -54,9 +46,7 @@ for r in range(1, ROUNDS + 1):
         if r > 1:
             results[name].append(ms)
 
-        # Clear out old counter-row versions so each round starts alike.
-        # Bench rows stay in actions_exp until the end: deleting them here
-        # is very slow (see sql/fk_delete_check.sql).
+
         conn.autocommit = True
         cur.execute("VACUUM verdict_counts_exp")
         conn.autocommit = False
@@ -64,9 +54,6 @@ for r in range(1, ROUNDS + 1):
 set_trigger(cur, True)
 conn.commit()
 
-# Remove the bench rows (pid 0 is never used by the dataset). A temporary
-# index on parent_action makes the foreign key check on each deleted row
-# an index lookup instead of a scan of the whole table.
 cur.execute("CREATE INDEX bench_parent ON actions_exp (parent_action)")
 cur.execute("DELETE FROM actions_exp WHERE pid = 0")
 cur.execute("DROP INDEX bench_parent")

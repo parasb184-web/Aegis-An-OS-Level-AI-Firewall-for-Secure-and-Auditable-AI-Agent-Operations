@@ -1,5 +1,3 @@
--- One round of sql/trigger_cost.sql: each of the four cases once.
-
 \echo === live_trigger_on run :run
 BEGIN;
 EXPLAIN (ANALYZE, BUFFERS)
