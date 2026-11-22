@@ -1,2 +1,0 @@
-warning: unable to access '.git/info/exclude': Operation not permitted
-fatal: cannot use .git/info/exclude as an exclude file
