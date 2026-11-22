@@ -12,6 +12,9 @@ import db
 
 app = FastAPI()
 
+# ---------------------------------------------------------------------------
+# Configuration constants
+# ---------------------------------------------------------------------------
 SCENARIOS = ("normal", "credentials", "massread")
 
 ROOTS_FILE = os.environ.get("AEGIS_ROOTS", "/tmp/aegis_roots")
@@ -26,6 +29,9 @@ _running = None
 _running_lock = threading.Lock()
 
 
+# ---------------------------------------------------------------------------
+# Dashboard and telemetry routes
+# ---------------------------------------------------------------------------
 @app.get("/counts")
 def counts():
     with cursor() as cur:
@@ -87,6 +93,9 @@ def run(scenario: str):
     return {"started": True, "scenario": scenario, "pid": proc.pid}
 
 
+# ---------------------------------------------------------------------------
+# Helper utilities
+# ---------------------------------------------------------------------------
 @contextlib.contextmanager
 def cursor():
     conn = db.connect()
