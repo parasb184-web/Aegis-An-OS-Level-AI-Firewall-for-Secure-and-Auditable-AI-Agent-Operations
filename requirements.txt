@@ -1,0 +1,8 @@
+# Aegis AI Firewall - Python Dependencies
+
+# Web API framework & ASGI server for dashboard and telemetry
+fastapi>=0.100.0
+uvicorn>=0.20.0
+
+# PostgreSQL database driver
+psycopg2-binary>=2.9.0
