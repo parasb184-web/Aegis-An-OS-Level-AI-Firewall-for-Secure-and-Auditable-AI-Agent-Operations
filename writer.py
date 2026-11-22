@@ -5,20 +5,16 @@ from typing import Any, List, Optional, Tuple
 
 import db
 
-# Sentinel object placed on queue to signal clean shutdown
 _STOP: object = object()
 
-# Thread handle and in-memory queue
 _thread: Optional[threading.Thread] = None
 decisions: "queue.Queue[Any]" = queue.Queue()
 
-# Batch and flush configuration
-BATCH_SIZE: int = 50          # Maximum decisions held before forcing a flush
-FLUSH_SECONDS: float = 2.0    # Maximum time decisions can linger in memory
-RETRY_WAIT: float = 3.0       # Backoff delay before attempting DB reconnection
-STOP_TIMEOUT: float = 10.0    # Maximum seconds to wait for worker to flush on exit
+BATCH_SIZE: int = 50         
+FLUSH_SECONDS: float = 2.0    
+RETRY_WAIT: float = 3.0       
+STOP_TIMEOUT: float = 10.0    
 
-# Record tuple type: (pid, process_name, path, verdict, reason)
 DecisionRecord = Tuple[int, str, str, str, str]
 
 

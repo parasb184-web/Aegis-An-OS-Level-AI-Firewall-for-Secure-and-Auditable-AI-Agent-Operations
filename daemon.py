@@ -1,10 +1,3 @@
-"""Aegis Kernel Firewall Monitoring Daemon.
-
-Uses Linux fanotify in permission mode (FAN_OPEN_PERM) to intercept file open
-events across monitored directories. Evaluates process trees against PostgreSQL
-security policies and the dynamic sliding-window risk engine before responding to
-the Linux kernel with FAN_ALLOW or FAN_DENY.
-"""
 
 import ctypes
 import json
@@ -23,31 +16,28 @@ import db
 import risk
 import writer
 
-# Load Linux C library for fanotify syscalls (with fallback for static analysis on Windows)
 try:
     libc = ctypes.CDLL("libc.so.6", use_errno=True)
 except (OSError, AttributeError):
     libc = None
 
-# Linux fanotify bit flags
-FAN_CLOEXEC: int        = 0x00000001  # Close-on-exec flag on new file descriptor
-FAN_CLASS_CONTENT: int  = 0x00000004  # Permission events before access; content inspection
-FAN_OPEN_PERM: int      = 0x00010000  # File open permission event (blocks until answered)
-FAN_EVENT_ON_CHILD: int = 0x08000000  # Include child directory events
-FAN_MARK_ADD: int       = 0x00000001  # Add directory to fanotify watch list
+FAN_CLOEXEC: int        = 0x00000001 
+FAN_CLASS_CONTENT: int  = 0x00000004  
+FAN_OPEN_PERM: int      = 0x00010000  
+FAN_EVENT_ON_CHILD: int = 0x08000000  
+FAN_MARK_ADD: int       = 0x00000001  
 FAN_CLOEXEC: int        = 0x00000001  
 FAN_CLASS_CONTENT: int  = 0x00000004  
 FAN_OPEN_PERM: int      = 0x00010000  
 FAN_EVENT_ON_CHILD: int = 0x08000000  
 FAN_MARK_ADD: int       = 0x00000001  
 
-# Kernel response verdicts
-FAN_ALLOW: int          = 0x01        # Grant permission to open file
-FAN_DENY: int           = 0x02        # Deny open with EPERM
+FAN_ALLOW: int          = 0x01        
+FAN_DENY: int           = 0x02        
 FAN_ALLOW: int          = 0x01        
 FAN_DENY: int           = 0x02       
 
-AT_FDCWD: int           = -100        # Special fd for current working directory
+AT_FDCWD: int           = -100       
 O_RDONLY: int           = 0
 AT_FDCWD: int           = -100       
 O_RDONLY: int           = 0
@@ -61,8 +51,6 @@ SWEEP_SECONDS: float    = 1.0
 MAX_DEPTH: int          = 40
 DEFAULT_STATUS: str     = "/tmp/aegis_status.json"
 
-# Binary struct format for struct fanotify_event_metadata:
-# < (little endian) I (event_len) B (vers) B (reserved) H (metadata_len) Q (mask) i (fd) i (pid)
 EVENT_FORMAT: str       = "<IBBHQii"
 
 EVENT_FORMAT: str       = "<IBBHQii"
@@ -79,7 +67,6 @@ if libc is not None:
 
 
 def start_fanotify() -> int:
-    """Initialize fanotify in permission mode (requires CAP_SYS_ADMIN)."""
     if libc is None:
         print("fanotify requires Linux glibc (libc.so.6).")
         sys.exit(1)
@@ -104,7 +91,6 @@ def start_fanotify() -> int:
     return fan_fd
 
 def watch_folder(fan_fd: int, folder: str) -> None:
-    """Mark a directory path for child permission event interception."""
     if libc is None:
         return
     result = libc.fanotify_mark(
