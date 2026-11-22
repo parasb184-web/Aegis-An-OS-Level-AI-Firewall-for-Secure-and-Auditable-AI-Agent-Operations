@@ -1,16 +1,4 @@
-"""
-fake_agent.py — Demo AI agent for Aegis firewall testing.
 
-Simulates three realistic agent behaviours:
-  normal      — reads a small set of project source files (benign).
-  credentials — reads a source file then attempts to open an SSH private key.
-  massread    — iterates over many note files across several subdirectories.
-
-Usage:
-    python3 fake_agent.py [normal|credentials|massread]
-
-The daemon intercepts these file-open calls via fanotify and logs verdicts.
-"""
 
 import os
 import sys
