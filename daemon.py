@@ -13,6 +13,7 @@ import signal
 import struct
 import sys
 import tempfile
+import threading
 import time
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -337,6 +338,13 @@ def main() -> None:
     watching = folder
     roots_file = roots_path
     publish_status()
+
+    def heartbeat_worker() -> None:
+        while True:
+            time.sleep(1.0)
+            publish_status()
+
+    threading.Thread(target=heartbeat_worker, daemon=True).start()
 
     signal.signal(signal.SIGINT, on_signal)
     signal.signal(signal.SIGTERM, on_signal)
