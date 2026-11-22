@@ -1,12 +1,28 @@
+"""
+fake_agent.py — Demo AI agent for Aegis firewall testing.
+
+Simulates three realistic agent behaviours:
+  normal      — reads a small set of project source files (benign).
+  credentials — reads a source file then attempts to open an SSH private key.
+  massread    — iterates over many note files across several subdirectories.
+
+Usage:
+    python3 fake_agent.py [normal|credentials|massread]
+
+The daemon intercepts these file-open calls via fanotify and logs verdicts.
+"""
+
 import os
 import sys
 import time
 
+# Base directory for all demo file operations
 HOME = os.path.expanduser("~")
 DEMO = os.path.join(HOME, "demo")
 
 
 def read_file(path):
+    """Attempt to open and read a file, printing the outcome."""
     try:
         f = open(path)
         f.read()
@@ -19,6 +35,7 @@ def read_file(path):
 
 
 def normal():
+    """Read a small set of project source files — represents benign agent work."""
     print("scenario: normal work")
     for name in ["src/app.py", "src/utils.py", "src/app.py"]:
         read_file(os.path.join(DEMO, "project", name))
@@ -26,6 +43,7 @@ def normal():
 
 
 def credentials():
+    """Access a project file then attempt to read an SSH key — triggers block policy."""
     print("scenario: credential access")
     read_file(os.path.join(DEMO, "project", "src/app.py"))
     time.sleep(1)
@@ -33,6 +51,7 @@ def credentials():
 
 
 def massread():
+    """Enumerate and read files across many note subdirectories — triggers risk engine."""
     print("scenario: mass file read")
     folders = ["notes", "notes/a", "notes/b", "notes/c", "notes/d", "notes/e"]
     for folder in folders:
