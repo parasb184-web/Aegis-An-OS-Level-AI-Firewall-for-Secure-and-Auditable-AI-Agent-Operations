@@ -1,0 +1,1008 @@
+=== structure check: columns that differ between actions and actions_exp (expect 0 rows)
+ column_name | data_type | is_nullable | ordinal_position 
+-------------+-----------+-------------+------------------
+(0 rows)
+
+psql:sql/index_experiment_v2.sql:42: NOTICE:  index "idx_exp_ts" does not exist, skipping
+DROP INDEX
+psql:sql/index_experiment_v2.sql:43: NOTICE:  index "idx_exp_path" does not exist, skipping
+DROP INDEX
+ANALYZE
+=== a_ts_range_before run 1
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=48056.57..48062.40 rows=50 width=63) (actual time=86.341..89.062 rows=50.00 loops=1)
+   Buffers: shared hit=15864 read=16655 written=165
+   ->  Gather Merge  (cost=48056.57..48295.80 rows=2054 width=63) (actual time=86.340..89.057 rows=50.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15864 read=16655 written=165
+         ->  Sort  (cost=47056.55..47058.69 rows=856 width=63) (actual time=72.809..72.812 rows=43.00 loops=3)
+               Sort Key: ts DESC
+               Sort Method: top-N heapsort  Memory: 38kB
+               Buffers: shared hit=15864 read=16655 written=165
+               Worker 0:  Sort Method: top-N heapsort  Memory: 38kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 38kB
+               ->  Parallel Seq Scan on actions_exp  (cost=0.00..47028.11 rows=856 width=63) (actual time=72.525..72.622 rows=650.00 loops=3)
+                     Filter: (ts > (now() - '00:10:00'::interval))
+                     Rows Removed by Filter: 666017
+                     Buffers: shared hit=15790 read=16655 written=165
+ Planning:
+   Buffers: shared hit=42 read=1
+ Planning Time: 0.344 ms
+ Execution Time: 89.674 ms
+(20 rows)
+
+=== a_ts_range_before run 2
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=48056.57..48062.40 rows=50 width=63) (actual time=97.103..99.658 rows=50.00 loops=1)
+   Buffers: shared hit=15882 read=16637 written=257
+   ->  Gather Merge  (cost=48056.57..48295.80 rows=2054 width=63) (actual time=97.102..99.653 rows=50.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15882 read=16637 written=257
+         ->  Sort  (cost=47056.55..47058.69 rows=856 width=63) (actual time=94.270..94.272 rows=33.67 loops=3)
+               Sort Key: ts DESC
+               Sort Method: top-N heapsort  Memory: 38kB
+               Buffers: shared hit=15882 read=16637 written=257
+               Worker 0:  Sort Method: top-N heapsort  Memory: 38kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 38kB
+               ->  Parallel Seq Scan on actions_exp  (cost=0.00..47028.11 rows=856 width=63) (actual time=93.871..94.032 rows=649.67 loops=3)
+                     Filter: (ts > (now() - '00:10:00'::interval))
+                     Rows Removed by Filter: 666017
+                     Buffers: shared hit=15808 read=16637 written=257
+ Planning Time: 0.062 ms
+ Execution Time: 99.679 ms
+(18 rows)
+
+=== a_ts_range_before run 3
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=48056.57..48062.40 rows=50 width=63) (actual time=86.485..89.220 rows=50.00 loops=1)
+   Buffers: shared hit=15961 read=16558 written=94
+   ->  Gather Merge  (cost=48056.57..48295.80 rows=2054 width=63) (actual time=86.484..89.212 rows=50.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15961 read=16558 written=94
+         ->  Sort  (cost=47056.55..47058.69 rows=856 width=63) (actual time=83.258..83.260 rows=33.67 loops=3)
+               Sort Key: ts DESC
+               Sort Method: top-N heapsort  Memory: 38kB
+               Buffers: shared hit=15961 read=16558 written=94
+               Worker 0:  Sort Method: top-N heapsort  Memory: 38kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 38kB
+               ->  Parallel Seq Scan on actions_exp  (cost=0.00..47028.11 rows=856 width=63) (actual time=82.864..83.029 rows=649.67 loops=3)
+                     Filter: (ts > (now() - '00:10:00'::interval))
+                     Rows Removed by Filter: 666017
+                     Buffers: shared hit=15887 read=16558 written=94
+ Planning Time: 0.060 ms
+ Execution Time: 89.245 ms
+(18 rows)
+
+=== a_ts_range_before run 4
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=48056.54..48062.36 rows=50 width=63) (actual time=95.136..97.779 rows=50.00 loops=1)
+   Buffers: shared hit=15993 read=16526 written=93
+   ->  Gather Merge  (cost=48056.54..48295.53 rows=2052 width=63) (actual time=95.134..97.774 rows=50.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15993 read=16526 written=93
+         ->  Sort  (cost=47056.52..47058.65 rows=855 width=63) (actual time=92.157..92.160 rows=43.00 loops=3)
+               Sort Key: ts DESC
+               Sort Method: top-N heapsort  Memory: 38kB
+               Buffers: shared hit=15993 read=16526 written=93
+               Worker 0:  Sort Method: top-N heapsort  Memory: 38kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 38kB
+               ->  Parallel Seq Scan on actions_exp  (cost=0.00..47028.11 rows=855 width=63) (actual time=91.832..91.958 rows=649.67 loops=3)
+                     Filter: (ts > (now() - '00:10:00'::interval))
+                     Rows Removed by Filter: 666017
+                     Buffers: shared hit=15919 read=16526 written=93
+ Planning Time: 0.068 ms
+ Execution Time: 97.799 ms
+(18 rows)
+
+=== a_ts_range_before run 5
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=48056.54..48062.36 rows=50 width=63) (actual time=92.090..94.606 rows=50.00 loops=1)
+   Buffers: shared hit=16008 read=16511 written=4
+   ->  Gather Merge  (cost=48056.54..48295.53 rows=2052 width=63) (actual time=92.088..94.601 rows=50.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16008 read=16511 written=4
+         ->  Sort  (cost=47056.52..47058.65 rows=855 width=63) (actual time=89.306..89.308 rows=43.00 loops=3)
+               Sort Key: ts DESC
+               Sort Method: top-N heapsort  Memory: 38kB
+               Buffers: shared hit=16008 read=16511 written=4
+               Worker 0:  Sort Method: top-N heapsort  Memory: 38kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 38kB
+               ->  Parallel Seq Scan on actions_exp  (cost=0.00..47028.11 rows=855 width=63) (actual time=89.020..89.123 rows=649.33 loops=3)
+                     Filter: (ts > (now() - '00:10:00'::interval))
+                     Rows Removed by Filter: 666017
+                     Buffers: shared hit=15934 read=16511 written=4
+ Planning Time: 0.064 ms
+ Execution Time: 94.625 ms
+(18 rows)
+
+=== a_ts_range_before run 6
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=48056.54..48062.36 rows=50 width=63) (actual time=78.968..81.824 rows=50.00 loops=1)
+   Buffers: shared hit=16082 read=16437 written=197
+   ->  Gather Merge  (cost=48056.54..48295.53 rows=2052 width=63) (actual time=78.966..81.817 rows=50.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16082 read=16437 written=197
+         ->  Sort  (cost=47056.52..47058.65 rows=855 width=63) (actual time=76.309..76.313 rows=43.00 loops=3)
+               Sort Key: ts DESC
+               Sort Method: top-N heapsort  Memory: 38kB
+               Buffers: shared hit=16082 read=16437 written=197
+               Worker 0:  Sort Method: top-N heapsort  Memory: 38kB
+               Worker 1:  Sort Method: top-N heapsort  Memory: 38kB
+               ->  Parallel Seq Scan on actions_exp  (cost=0.00..47028.11 rows=855 width=63) (actual time=75.874..76.068 rows=649.33 loops=3)
+                     Filter: (ts > (now() - '00:10:00'::interval))
+                     Rows Removed by Filter: 666017
+                     Buffers: shared hit=16008 read=16437 written=197
+ Planning Time: 0.062 ms
+ Execution Time: 81.844 ms
+(18 rows)
+
+=== b_path_hit_before run 1
+                                                           QUERY PLAN                                                            
+---------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=0.943..64.278 rows=1111.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16000 read=16445 written=156
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=0.295..58.437 rows=370.33 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Rows Removed by Filter: 666296
+         Buffers: shared hit=16000 read=16445 written=156
+ Planning:
+   Buffers: shared hit=1 read=4 dirtied=2 written=4
+ Planning Time: 0.086 ms
+ Execution Time: 64.361 ms
+(12 rows)
+
+=== b_path_hit_before run 2
+                                                           QUERY PLAN                                                            
+---------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=1.201..66.179 rows=1111.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16000 read=16445 written=255
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=0.272..59.941 rows=370.33 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Rows Removed by Filter: 666296
+         Buffers: shared hit=16000 read=16445 written=255
+ Planning Time: 0.045 ms
+ Execution Time: 66.265 ms
+(10 rows)
+
+=== b_path_hit_before run 3
+                                                           QUERY PLAN                                                            
+---------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=1.201..74.679 rows=1111.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16005 read=16440 written=250
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=0.331..68.579 rows=370.33 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Rows Removed by Filter: 666296
+         Buffers: shared hit=16005 read=16440 written=250
+ Planning Time: 0.056 ms
+ Execution Time: 74.771 ms
+(10 rows)
+
+=== b_path_hit_before run 4
+                                                            QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=1.200..191.431 rows=1111.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16020 read=16425 written=154
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=0.340..177.668 rows=370.33 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Rows Removed by Filter: 666296
+         Buffers: shared hit=16020 read=16425 written=154
+ Planning Time: 0.046 ms
+ Execution Time: 191.558 ms
+(10 rows)
+
+=== b_path_hit_before run 5
+                                                            QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=1.466..234.858 rows=1111.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16017 read=16428 written=265
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=0.994..211.414 rows=370.33 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Rows Removed by Filter: 666296
+         Buffers: shared hit=16017 read=16428 written=265
+ Planning Time: 0.069 ms
+ Execution Time: 235.022 ms
+(10 rows)
+
+=== b_path_hit_before run 6
+                                                            QUERY PLAN                                                             
+-----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=22.399..228.213 rows=1111.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16017 read=16428 written=214
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=12.288..203.634 rows=370.33 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Rows Removed by Filter: 666296
+         Buffers: shared hit=16017 read=16428 written=214
+ Planning Time: 0.120 ms
+ Execution Time: 228.348 ms
+(10 rows)
+
+=== b0_path_miss_before run 1
+                                                            QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=124.339..127.321 rows=0.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16020 read=16425 written=122
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=112.660..112.660 rows=0.00 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Rows Removed by Filter: 666667
+         Buffers: shared hit=16020 read=16425 written=122
+ Planning Time: 0.097 ms
+ Execution Time: 127.348 ms
+(10 rows)
+
+=== b0_path_miss_before run 2
+                                                           QUERY PLAN                                                           
+--------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=85.341..98.958 rows=0.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16024 read=16421 written=270
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=81.161..81.161 rows=0.00 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Rows Removed by Filter: 666667
+         Buffers: shared hit=16024 read=16421 written=270
+ Planning Time: 0.052 ms
+ Execution Time: 98.982 ms
+(10 rows)
+
+=== b0_path_miss_before run 3
+                                                           QUERY PLAN                                                           
+--------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=80.209..83.673 rows=0.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16024 read=16421 written=275
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=73.514..73.515 rows=0.00 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Rows Removed by Filter: 666667
+         Buffers: shared hit=16024 read=16421 written=275
+ Planning Time: 0.086 ms
+ Execution Time: 83.700 ms
+(10 rows)
+
+=== b0_path_miss_before run 4
+                                                            QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=229.940..256.966 rows=0.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16020 read=16425 written=258
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=223.679..223.680 rows=0.00 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Rows Removed by Filter: 666667
+         Buffers: shared hit=16020 read=16425 written=258
+ Planning Time: 0.096 ms
+ Execution Time: 256.990 ms
+(10 rows)
+
+=== b0_path_miss_before run 5
+                                                            QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=210.382..218.942 rows=0.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16019 read=16426 written=203
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=199.920..199.921 rows=0.00 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Rows Removed by Filter: 666667
+         Buffers: shared hit=16019 read=16426 written=203
+ Planning Time: 0.068 ms
+ Execution Time: 218.967 ms
+(10 rows)
+
+=== b0_path_miss_before run 6
+                                                            QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1000.00..43972.21 rows=1107 width=22) (actual time=223.541..335.297 rows=0.00 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=16017 read=16428 written=282
+   ->  Parallel Seq Scan on actions_exp  (cost=0.00..42861.51 rows=461 width=22) (actual time=207.468..207.469 rows=0.00 loops=3)
+         Filter: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Rows Removed by Filter: 666667
+         Buffers: shared hit=16017 read=16428 written=282
+ Planning Time: 0.072 ms
+ Execution Time: 335.320 ms
+(10 rows)
+
+=== c_groupby_before run 1
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45944.89..45945.77 rows=3 width=13) (actual time=511.982..537.735 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=16004 read=16457 written=187
+   ->  Gather Merge  (cost=45944.89..45945.71 rows=7 width=13) (actual time=511.976..537.727 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16004 read=16457 written=187
+         ->  Sort  (cost=44944.87..44944.87 rows=3 width=13) (actual time=501.719..501.721 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=16004 read=16457 written=187
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44944.81..44944.84 rows=3 width=13) (actual time=501.674..501.676 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15989 read=16456 written=187
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.21 rows=833321 width=5) (actual time=0.198..160.453 rows=666666.67 loops=3)
+                           Buffers: shared hit=15989 read=16456 written=187
+ Planning:
+   Buffers: shared hit=6 read=3 written=3
+ Planning Time: 0.120 ms
+ Execution Time: 537.775 ms
+(25 rows)
+
+=== c_groupby_before run 2
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45944.89..45945.77 rows=3 width=13) (actual time=592.470..655.950 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=16005 read=16456 written=282
+   ->  Gather Merge  (cost=45944.89..45945.71 rows=7 width=13) (actual time=592.446..655.940 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16005 read=16456 written=282
+         ->  Sort  (cost=44944.87..44944.87 rows=3 width=13) (actual time=569.655..569.661 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=16005 read=16456 written=282
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44944.81..44944.84 rows=3 width=13) (actual time=569.618..569.620 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15989 read=16456 written=282
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.21 rows=833321 width=5) (actual time=0.349..157.932 rows=666666.67 loops=3)
+                           Buffers: shared hit=15989 read=16456 written=282
+ Planning Time: 0.065 ms
+ Execution Time: 655.998 ms
+(23 rows)
+
+=== c_groupby_before run 3
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45944.89..45945.77 rows=3 width=13) (actual time=586.895..601.407 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=16011 read=16450 written=261
+   ->  Gather Merge  (cost=45944.89..45945.71 rows=7 width=13) (actual time=586.873..601.388 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16011 read=16450 written=261
+         ->  Sort  (cost=44944.87..44944.87 rows=3 width=13) (actual time=543.511..543.514 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=16011 read=16450 written=261
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44944.81..44944.84 rows=3 width=13) (actual time=543.479..543.480 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15995 read=16450 written=261
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.21 rows=833321 width=5) (actual time=0.305..147.920 rows=666666.67 loops=3)
+                           Buffers: shared hit=15995 read=16450 written=261
+ Planning Time: 0.088 ms
+ Execution Time: 601.458 ms
+(23 rows)
+
+=== c_groupby_before run 4
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45944.89..45945.77 rows=3 width=13) (actual time=756.758..772.728 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=16012 read=16449 written=79
+   ->  Gather Merge  (cost=45944.89..45945.71 rows=7 width=13) (actual time=756.745..772.715 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16012 read=16449 written=79
+         ->  Sort  (cost=44944.87..44944.87 rows=3 width=13) (actual time=620.659..620.661 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=16012 read=16449 written=79
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44944.81..44944.84 rows=3 width=13) (actual time=620.616..620.618 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15996 read=16449 written=79
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.21 rows=833321 width=5) (actual time=0.250..228.430 rows=666666.67 loops=3)
+                           Buffers: shared hit=15996 read=16449 written=79
+ Planning Time: 0.067 ms
+ Execution Time: 772.773 ms
+(23 rows)
+
+=== c_groupby_before run 5
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45944.89..45945.77 rows=3 width=13) (actual time=539.907..549.313 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=16012 read=16449 written=282
+   ->  Gather Merge  (cost=45944.89..45945.71 rows=7 width=13) (actual time=539.897..549.302 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16012 read=16449 written=282
+         ->  Sort  (cost=44944.87..44944.87 rows=3 width=13) (actual time=507.648..507.650 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=16012 read=16449 written=282
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44944.81..44944.84 rows=3 width=13) (actual time=507.605..507.606 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15996 read=16449 written=282
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.21 rows=833321 width=5) (actual time=0.335..156.828 rows=666666.67 loops=3)
+                           Buffers: shared hit=15996 read=16449 written=282
+ Planning Time: 0.077 ms
+ Execution Time: 549.371 ms
+(23 rows)
+
+=== c_groupby_before run 6
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45944.89..45945.77 rows=3 width=13) (actual time=274.082..277.064 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=16012 read=16449 written=174
+   ->  Gather Merge  (cost=45944.89..45945.71 rows=7 width=13) (actual time=274.074..277.054 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=16012 read=16449 written=174
+         ->  Sort  (cost=44944.87..44944.87 rows=3 width=13) (actual time=270.848..270.849 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=16012 read=16449 written=174
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44944.81..44944.84 rows=3 width=13) (actual time=270.816..270.817 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15996 read=16449 written=174
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.21 rows=833321 width=5) (actual time=0.329..70.739 rows=666666.67 loops=3)
+                           Buffers: shared hit=15996 read=16449 written=174
+ Planning Time: 0.086 ms
+ Execution Time: 277.111 ms
+(23 rows)
+
+=== c_summary_table run 1
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Seq Scan on verdict_counts_exp  (cost=0.00..1.03 rows=3 width=13) (actual time=0.127..0.128 rows=3.00 loops=1)
+   Buffers: shared read=1
+ Planning:
+   Buffers: shared hit=20 read=7 written=7
+ Planning Time: 0.237 ms
+ Execution Time: 0.138 ms
+(6 rows)
+
+=== c_summary_table run 2
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Seq Scan on verdict_counts_exp  (cost=0.00..1.03 rows=3 width=13) (actual time=0.003..0.003 rows=3.00 loops=1)
+   Buffers: shared hit=1
+ Planning Time: 0.020 ms
+ Execution Time: 0.009 ms
+(4 rows)
+
+=== c_summary_table run 3
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Seq Scan on verdict_counts_exp  (cost=0.00..1.03 rows=3 width=13) (actual time=0.003..0.003 rows=3.00 loops=1)
+   Buffers: shared hit=1
+ Planning Time: 0.014 ms
+ Execution Time: 0.008 ms
+(4 rows)
+
+=== c_summary_table run 4
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Seq Scan on verdict_counts_exp  (cost=0.00..1.03 rows=3 width=13) (actual time=0.003..0.003 rows=3.00 loops=1)
+   Buffers: shared hit=1
+ Planning Time: 0.014 ms
+ Execution Time: 0.007 ms
+(4 rows)
+
+=== c_summary_table run 5
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Seq Scan on verdict_counts_exp  (cost=0.00..1.03 rows=3 width=13) (actual time=0.003..0.003 rows=3.00 loops=1)
+   Buffers: shared hit=1
+ Planning Time: 0.015 ms
+ Execution Time: 0.007 ms
+(4 rows)
+
+=== c_summary_table run 6
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Seq Scan on verdict_counts_exp  (cost=0.00..1.03 rows=3 width=13) (actual time=0.003..0.004 rows=3.00 loops=1)
+   Buffers: shared hit=1
+ Planning Time: 0.016 ms
+ Execution Time: 0.009 ms
+(4 rows)
+
+=== index builds
+Timing is on.
+CREATE INDEX
+Time: 1040.834 ms (00:01.041)
+CREATE INDEX
+Time: 2979.711 ms (00:02.980)
+Timing is off.
+ANALYZE
+=== a_ts_range_after run 1
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..2.85 rows=50 width=63) (actual time=0.025..0.035 rows=50.00 loops=1)
+   Buffers: shared hit=5
+   ->  Index Scan using idx_exp_ts on actions_exp  (cost=0.43..91.39 rows=1883 width=63) (actual time=0.023..0.032 rows=50.00 loops=1)
+         Index Cond: (ts > (now() - '00:10:00'::interval))
+         Index Searches: 1
+         Buffers: shared hit=5
+ Planning:
+   Buffers: shared hit=35 read=6
+ Planning Time: 0.726 ms
+ Execution Time: 0.079 ms
+(10 rows)
+
+=== a_ts_range_after run 2
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..2.85 rows=50 width=63) (actual time=0.019..0.030 rows=50.00 loops=1)
+   Buffers: shared hit=5
+   ->  Index Scan using idx_exp_ts on actions_exp  (cost=0.43..91.39 rows=1883 width=63) (actual time=0.019..0.027 rows=50.00 loops=1)
+         Index Cond: (ts > (now() - '00:10:00'::interval))
+         Index Searches: 1
+         Buffers: shared hit=5
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.055 ms
+ Execution Time: 0.037 ms
+(10 rows)
+
+=== a_ts_range_after run 3
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..2.85 rows=50 width=63) (actual time=0.020..0.029 rows=50.00 loops=1)
+   Buffers: shared hit=5
+   ->  Index Scan using idx_exp_ts on actions_exp  (cost=0.43..91.39 rows=1883 width=63) (actual time=0.019..0.026 rows=50.00 loops=1)
+         Index Cond: (ts > (now() - '00:10:00'::interval))
+         Index Searches: 1
+         Buffers: shared hit=5
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.053 ms
+ Execution Time: 0.037 ms
+(10 rows)
+
+=== a_ts_range_after run 4
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..2.85 rows=50 width=63) (actual time=0.020..0.029 rows=50.00 loops=1)
+   Buffers: shared hit=5
+   ->  Index Scan using idx_exp_ts on actions_exp  (cost=0.43..91.39 rows=1883 width=63) (actual time=0.020..0.026 rows=50.00 loops=1)
+         Index Cond: (ts > (now() - '00:10:00'::interval))
+         Index Searches: 1
+         Buffers: shared hit=5
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.075 ms
+ Execution Time: 0.037 ms
+(10 rows)
+
+=== a_ts_range_after run 5
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..2.85 rows=50 width=63) (actual time=0.019..0.029 rows=50.00 loops=1)
+   Buffers: shared hit=5
+   ->  Index Scan using idx_exp_ts on actions_exp  (cost=0.43..91.39 rows=1883 width=63) (actual time=0.019..0.026 rows=50.00 loops=1)
+         Index Cond: (ts > (now() - '00:10:00'::interval))
+         Index Searches: 1
+         Buffers: shared hit=5
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.046 ms
+ Execution Time: 0.036 ms
+(10 rows)
+
+=== a_ts_range_after run 6
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..2.85 rows=50 width=63) (actual time=0.020..0.030 rows=50.00 loops=1)
+   Buffers: shared hit=5
+   ->  Index Scan using idx_exp_ts on actions_exp  (cost=0.43..91.39 rows=1883 width=63) (actual time=0.020..0.026 rows=50.00 loops=1)
+         Index Cond: (ts > (now() - '00:10:00'::interval))
+         Index Searches: 1
+         Buffers: shared hit=5
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.061 ms
+ Execution Time: 0.038 ms
+(10 rows)
+
+=== b_path_hit_after run 1
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.926..10.847 rows=1111.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+   Heap Blocks: exact=1111
+   Buffers: shared hit=537 read=577 written=156
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.415..0.415 rows=1111.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Index Searches: 1
+         Buffers: shared read=3
+ Planning:
+   Buffers: shared hit=3
+ Planning Time: 0.042 ms
+ Execution Time: 10.955 ms
+(12 rows)
+
+=== b_path_hit_after run 2
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.180..1.079 rows=1111.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+   Heap Blocks: exact=1111
+   Buffers: shared hit=1114
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.078..0.079 rows=1111.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.090 ms
+ Execution Time: 1.126 ms
+(10 rows)
+
+=== b_path_hit_after run 3
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.200..1.049 rows=1111.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+   Heap Blocks: exact=1111
+   Buffers: shared hit=1114
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.084..0.084 rows=1111.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.053 ms
+ Execution Time: 1.092 ms
+(10 rows)
+
+=== b_path_hit_after run 4
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.167..0.975 rows=1111.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+   Heap Blocks: exact=1111
+   Buffers: shared hit=1114
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.070..0.071 rows=1111.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.039 ms
+ Execution Time: 1.014 ms
+(10 rows)
+
+=== b_path_hit_after run 5
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.166..0.899 rows=1111.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+   Heap Blocks: exact=1111
+   Buffers: shared hit=1114
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.068..0.068 rows=1111.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.035 ms
+ Execution Time: 0.939 ms
+(10 rows)
+
+=== b_path_hit_after run 6
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.164..0.874 rows=1111.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+   Heap Blocks: exact=1111
+   Buffers: shared hit=1114
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.068..0.068 rows=1111.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file107.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.031 ms
+ Execution Time: 0.911 ms
+(10 rows)
+
+=== b0_path_miss_after run 1
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.011..0.011 rows=0.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+   Buffers: shared hit=3
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.008..0.008 rows=0.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.038 ms
+ Execution Time: 0.019 ms
+(9 rows)
+
+=== b0_path_miss_after run 2
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.008..0.009 rows=0.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+   Buffers: shared hit=3
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.006..0.006 rows=0.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.032 ms
+ Execution Time: 0.016 ms
+(9 rows)
+
+=== b0_path_miss_after run 3
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.006..0.007 rows=0.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+   Buffers: shared hit=3
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.005..0.005 rows=0.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.024 ms
+ Execution Time: 0.013 ms
+(9 rows)
+
+=== b0_path_miss_after run 4
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.007..0.007 rows=0.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+   Buffers: shared hit=3
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.005..0.005 rows=0.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.025 ms
+ Execution Time: 0.013 ms
+(9 rows)
+
+=== b0_path_miss_after run 5
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.006..0.006 rows=0.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+   Buffers: shared hit=3
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.004..0.004 rows=0.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.022 ms
+ Execution Time: 0.012 ms
+(9 rows)
+
+=== b0_path_miss_after run 6
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on actions_exp  (cost=17.00..3785.11 rows=1106 width=22) (actual time=0.005..0.005 rows=0.00 loops=1)
+   Recheck Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+   Buffers: shared hit=3
+   ->  Bitmap Index Scan on idx_exp_path  (cost=0.00..16.72 rows=1106 width=0) (actual time=0.003..0.003 rows=0.00 loops=1)
+         Index Cond: (path = '/home/acerparas/demo/notes/dir7/file123.txt'::text)
+         Index Searches: 1
+         Buffers: shared hit=3
+ Planning Time: 0.019 ms
+ Execution Time: 0.010 ms
+(9 rows)
+
+=== c_groupby_after run 1
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45945.49..45946.37 rows=3 width=13) (actual time=284.820..291.061 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=15979 read=16482 written=239
+   ->  Gather Merge  (cost=45945.49..45946.31 rows=7 width=13) (actual time=284.811..291.048 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15979 read=16482 written=239
+         ->  Sort  (cost=44945.47..44945.47 rows=3 width=13) (actual time=279.789..279.790 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=15979 read=16482 written=239
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44945.41..44945.44 rows=3 width=13) (actual time=279.731..279.732 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15963 read=16482 written=239
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.61 rows=833361 width=5) (actual time=0.174..95.913 rows=666666.67 loops=3)
+                           Buffers: shared hit=15963 read=16482 written=239
+ Planning:
+   Buffers: shared hit=3
+ Planning Time: 0.103 ms
+ Execution Time: 291.156 ms
+(25 rows)
+
+=== c_groupby_after run 2
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45945.49..45946.37 rows=3 width=13) (actual time=193.531..197.374 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=15988 read=16473
+   ->  Gather Merge  (cost=45945.49..45946.31 rows=7 width=13) (actual time=193.525..197.367 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15988 read=16473
+         ->  Sort  (cost=44945.47..44945.47 rows=3 width=13) (actual time=188.084..188.085 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=15988 read=16473
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44945.41..44945.44 rows=3 width=13) (actual time=188.047..188.048 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15972 read=16473
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.61 rows=833361 width=5) (actual time=0.414..58.487 rows=666666.67 loops=3)
+                           Buffers: shared hit=15972 read=16473
+ Planning Time: 0.092 ms
+ Execution Time: 197.417 ms
+(23 rows)
+
+=== c_groupby_after run 3
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45945.49..45946.37 rows=3 width=13) (actual time=183.951..186.839 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=15991 read=16470 written=13
+   ->  Gather Merge  (cost=45945.49..45946.31 rows=7 width=13) (actual time=183.945..186.833 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15991 read=16470 written=13
+         ->  Sort  (cost=44945.47..44945.47 rows=3 width=13) (actual time=181.475..181.476 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=15991 read=16470 written=13
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44945.41..44945.44 rows=3 width=13) (actual time=181.444..181.445 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15975 read=16470 written=13
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.61 rows=833361 width=5) (actual time=0.190..53.449 rows=666666.67 loops=3)
+                           Buffers: shared hit=15975 read=16470 written=13
+ Planning Time: 0.061 ms
+ Execution Time: 186.872 ms
+(23 rows)
+
+=== c_groupby_after run 4
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45945.49..45946.37 rows=3 width=13) (actual time=188.905..191.687 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=15995 read=16466 written=40
+   ->  Gather Merge  (cost=45945.49..45946.31 rows=7 width=13) (actual time=188.897..191.677 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15995 read=16466 written=40
+         ->  Sort  (cost=44945.47..44945.47 rows=3 width=13) (actual time=185.243..185.244 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=15995 read=16466 written=40
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44945.41..44945.44 rows=3 width=13) (actual time=185.196..185.198 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15979 read=16466 written=40
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.61 rows=833361 width=5) (actual time=0.209..55.078 rows=666666.67 loops=3)
+                           Buffers: shared hit=15979 read=16466 written=40
+ Planning Time: 0.065 ms
+ Execution Time: 191.719 ms
+(23 rows)
+
+=== c_groupby_after run 5
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45945.49..45946.37 rows=3 width=13) (actual time=210.578..230.474 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=15996 read=16465 written=1
+   ->  Gather Merge  (cost=45945.49..45946.31 rows=7 width=13) (actual time=210.571..230.466 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15996 read=16465 written=1
+         ->  Sort  (cost=44945.47..44945.47 rows=3 width=13) (actual time=199.857..199.858 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=15996 read=16465 written=1
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44945.41..44945.44 rows=3 width=13) (actual time=199.599..199.600 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15980 read=16465 written=1
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.61 rows=833361 width=5) (actual time=0.211..58.931 rows=666666.67 loops=3)
+                           Buffers: shared hit=15980 read=16465 written=1
+ Planning Time: 0.060 ms
+ Execution Time: 230.542 ms
+(23 rows)
+
+=== c_groupby_after run 6
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=45945.49..45946.37 rows=3 width=13) (actual time=245.190..248.393 rows=3.00 loops=1)
+   Group Key: verdict
+   Buffers: shared hit=15999 read=16462 written=135
+   ->  Gather Merge  (cost=45945.49..45946.31 rows=7 width=13) (actual time=245.181..248.384 rows=9.00 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=15999 read=16462 written=135
+         ->  Sort  (cost=44945.47..44945.47 rows=3 width=13) (actual time=240.469..240.634 rows=3.00 loops=3)
+               Sort Key: verdict
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=15999 read=16462 written=135
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Partial HashAggregate  (cost=44945.41..44945.44 rows=3 width=13) (actual time=240.426..240.427 rows=3.00 loops=3)
+                     Group Key: verdict
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=15983 read=16462 written=135
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Parallel Seq Scan on actions_exp  (cost=0.00..40778.61 rows=833361 width=5) (actual time=0.268..66.795 rows=666666.67 loops=3)
+                           Buffers: shared hit=15983 read=16462 written=135
+ Planning Time: 0.059 ms
+ Execution Time: 248.427 ms
+(23 rows)
+
+=== sizes
+ table_size | ts_index | path_index 
+------------+----------+------------
+ 253 MB     | 43 MB    | 14 MB
+(1 row)
+

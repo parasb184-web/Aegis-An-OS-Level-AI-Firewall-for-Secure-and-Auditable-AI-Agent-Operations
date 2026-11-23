@@ -1,0 +1,366 @@
+CREATE FUNCTION
+psql:sql/trigger_cost.sql:26: NOTICE:  trigger "actions_exp_count_verdict" for relation "actions_exp" does not exist, skipping
+DROP TRIGGER
+CREATE TRIGGER
+=== live_trigger_on run 1
+BEGIN
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=97.334..97.335 rows=0.00 loops=1)
+   Buffers: shared hit=59911 read=7 dirtied=192 written=189
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=4.926..17.423 rows=10000.00 loops=1)
+         Buffers: shared hit=10010 read=4 dirtied=1
+ Planning:
+   Buffers: shared hit=24 read=4
+ Planning Time: 3.057 ms
+ Trigger for constraint actions_parent_action_fkey: time=17.899 calls=10000
+ Trigger actions_count_verdict: time=765.823 calls=10000
+ Execution Time: 883.511 ms
+(10 rows)
+
+ROLLBACK
+=== live_trigger_off run 1
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=62.884..62.884 rows=0.00 loops=1)
+   Buffers: shared hit=60343 dirtied=183 written=183
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.826..8.442 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.093 ms
+ Trigger for constraint actions_parent_action_fkey: time=5.123 calls=10000
+ Execution Time: 68.441 ms
+(7 rows)
+
+ROLLBACK
+=== exp_trigger_on run 1
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=78.778..78.779 rows=0.00 loops=1)
+   Buffers: shared hit=89711 read=18 dirtied=206 written=193
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.933..8.255 rows=10000.00 loops=1)
+         Buffers: shared hit=10012 read=1 dirtied=1
+ Planning Time: 0.087 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=14.399 calls=10000
+ Trigger actions_exp_count_verdict: time=725.979 calls=10000
+ Execution Time: 820.868 ms
+(8 rows)
+
+ROLLBACK
+=== exp_trigger_off run 1
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=73.446..73.446 rows=0.00 loops=1)
+   Buffers: shared hit=89943 dirtied=191 written=191
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.408..7.983 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.062 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=5.617 calls=10000
+ Execution Time: 79.463 ms
+(7 rows)
+
+ROLLBACK
+=== live_trigger_on run 2
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=62.558..62.558 rows=0.00 loops=1)
+   Buffers: shared hit=60336 dirtied=180 written=180
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.419..8.193 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.068 ms
+ Trigger for constraint actions_parent_action_fkey: time=13.122 calls=10000
+ Trigger actions_count_verdict: time=710.619 calls=10000
+ Execution Time: 787.902 ms
+(8 rows)
+
+ROLLBACK
+=== live_trigger_off run 2
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=57.099..57.100 rows=0.00 loops=1)
+   Buffers: shared hit=60346 dirtied=185 written=185
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.424..7.408 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.072 ms
+ Trigger for constraint actions_parent_action_fkey: time=5.091 calls=10000
+ Execution Time: 62.617 ms
+(7 rows)
+
+ROLLBACK
+=== exp_trigger_on run 2
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=62.952..62.953 rows=0.00 loops=1)
+   Buffers: shared hit=89962 dirtied=195 written=194
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.447..7.020 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.075 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=14.577 calls=10000
+ Trigger actions_exp_count_verdict: time=739.185 calls=10000
+ Execution Time: 818.346 ms
+(8 rows)
+
+ROLLBACK
+=== exp_trigger_off run 2
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=76.399..76.400 rows=0.00 loops=1)
+   Buffers: shared hit=90273 dirtied=188 written=188
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.809..9.373 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.082 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=5.098 calls=10000
+ Execution Time: 81.914 ms
+(7 rows)
+
+ROLLBACK
+=== live_trigger_on run 3
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=53.778..53.779 rows=0.00 loops=1)
+   Buffers: shared hit=60327 dirtied=175 written=175
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.375..7.776 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.063 ms
+ Trigger for constraint actions_parent_action_fkey: time=12.903 calls=10000
+ Trigger actions_count_verdict: time=744.187 calls=10000
+ Execution Time: 812.456 ms
+(8 rows)
+
+ROLLBACK
+=== live_trigger_off run 3
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=47.417..47.418 rows=0.00 loops=1)
+   Buffers: shared hit=60315 dirtied=169 written=169
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.392..6.535 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.077 ms
+ Trigger for constraint actions_parent_action_fkey: time=4.708 calls=10000
+ Execution Time: 52.525 ms
+(7 rows)
+
+ROLLBACK
+=== exp_trigger_on run 3
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=72.104..72.105 rows=0.00 loops=1)
+   Buffers: shared hit=90449 dirtied=179 written=179
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.402..8.092 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.078 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=13.137 calls=10000
+ Trigger actions_exp_count_verdict: time=754.741 calls=10000
+ Execution Time: 841.648 ms
+(8 rows)
+
+ROLLBACK
+=== exp_trigger_off run 3
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=65.446..65.447 rows=0.00 loops=1)
+   Buffers: shared hit=90470 dirtied=189 written=188
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.439..7.843 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.061 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=5.425 calls=10000
+ Execution Time: 71.270 ms
+(7 rows)
+
+ROLLBACK
+=== live_trigger_on run 4
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=59.695..59.696 rows=0.00 loops=1)
+   Buffers: shared hit=60368 dirtied=196 written=196
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.425..7.682 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.110 ms
+ Trigger for constraint actions_parent_action_fkey: time=13.215 calls=10000
+ Trigger actions_count_verdict: time=728.288 calls=10000
+ Execution Time: 802.922 ms
+(8 rows)
+
+ROLLBACK
+=== live_trigger_off run 4
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=63.839..63.839 rows=0.00 loops=1)
+   Buffers: shared hit=60365 dirtied=194 written=194
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.842..9.642 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.067 ms
+ Trigger for constraint actions_parent_action_fkey: time=4.968 calls=10000
+ Execution Time: 69.221 ms
+(7 rows)
+
+ROLLBACK
+=== exp_trigger_on run 4
+BEGIN
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=84.272..84.273 rows=0.00 loops=1)
+   Buffers: shared hit=90507 dirtied=208 written=208
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.857..10.783 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.134 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=13.904 calls=10000
+ Trigger actions_exp_count_verdict: time=732.364 calls=10000
+ Execution Time: 832.312 ms
+(8 rows)
+
+ROLLBACK
+=== exp_trigger_off run 4
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=61.607..61.609 rows=0.00 loops=1)
+   Buffers: shared hit=90469 dirtied=189 written=189
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.384..7.535 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.062 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=10.176 calls=10000
+ Execution Time: 72.422 ms
+(7 rows)
+
+ROLLBACK
+=== live_trigger_on run 5
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=46.922..46.923 rows=0.00 loops=1)
+   Buffers: shared hit=60317 dirtied=170 written=170
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.439..7.097 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.076 ms
+ Trigger for constraint actions_parent_action_fkey: time=12.878 calls=10000
+ Trigger actions_count_verdict: time=721.718 calls=10000
+ Execution Time: 783.207 ms
+(8 rows)
+
+ROLLBACK
+=== live_trigger_off run 5
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=53.744..53.745 rows=0.00 loops=1)
+   Buffers: shared hit=60332 dirtied=178 written=178
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.454..8.207 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.063 ms
+ Trigger for constraint actions_parent_action_fkey: time=4.902 calls=10000
+ Execution Time: 59.063 ms
+(7 rows)
+
+ROLLBACK
+=== exp_trigger_on run 5
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=64.977..64.978 rows=0.00 loops=1)
+   Buffers: shared hit=90453 dirtied=179 written=179
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.467..7.567 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.072 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=13.257 calls=10000
+ Trigger actions_exp_count_verdict: time=698.563 calls=10000
+ Execution Time: 778.395 ms
+(8 rows)
+
+ROLLBACK
+=== exp_trigger_off run 5
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=67.189..67.190 rows=0.00 loops=1)
+   Buffers: shared hit=90449 dirtied=179 written=179
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.382..7.719 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.062 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=4.943 calls=10000
+ Execution Time: 72.521 ms
+(7 rows)
+
+ROLLBACK
+=== live_trigger_on run 6
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=54.682..54.682 rows=0.00 loops=1)
+   Buffers: shared hit=60317 dirtied=171 written=170
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.390..7.523 rows=10000.00 loops=1)
+         Buffers: shared hit=10000 dirtied=1
+ Planning Time: 0.064 ms
+ Trigger for constraint actions_parent_action_fkey: time=12.711 calls=10000
+ Trigger actions_count_verdict: time=706.725 calls=10000
+ Execution Time: 775.697 ms
+(8 rows)
+
+ROLLBACK
+=== live_trigger_off run 6
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions  (cost=0.00..425.00 rows=0 width=0) (actual time=46.559..46.567 rows=0.00 loops=1)
+   Buffers: shared hit=60317 dirtied=170 written=170
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.386..6.985 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.062 ms
+ Trigger for constraint actions_parent_action_fkey: time=5.273 calls=10000
+ Execution Time: 52.436 ms
+(7 rows)
+
+ROLLBACK
+=== exp_trigger_on run 6
+BEGIN
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=56.679..56.679 rows=0.00 loops=1)
+   Buffers: shared hit=90467 dirtied=188 written=188
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.418..7.583 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.066 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=12.252 calls=10000
+ Trigger actions_exp_count_verdict: time=677.337 calls=10000
+ Execution Time: 747.838 ms
+(8 rows)
+
+ROLLBACK
+=== exp_trigger_off run 6
+BEGIN
+ALTER TABLE
+                                                             QUERY PLAN                                                              
+-------------------------------------------------------------------------------------------------------------------------------------
+ Insert on actions_exp  (cost=0.00..425.00 rows=0 width=0) (actual time=54.886..54.887 rows=0.00 loops=1)
+   Buffers: shared hit=90454 read=1 dirtied=182 written=180
+   ->  Function Scan on generate_series i  (cost=0.00..425.00 rows=10000 width=180) (actual time=0.400..6.873 rows=10000.00 loops=1)
+         Buffers: shared hit=10000
+ Planning Time: 0.061 ms
+ Trigger for constraint actions_exp_parent_action_fkey: time=4.917 calls=10000
+ Execution Time: 60.194 ms
+(7 rows)
+
+ROLLBACK

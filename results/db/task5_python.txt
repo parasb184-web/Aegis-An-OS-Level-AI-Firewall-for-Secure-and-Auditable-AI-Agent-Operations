@@ -1,0 +1,17 @@
+round 1 trigger_on     1942.6 ms
+round 1 trigger_off    1656.3 ms
+round 2 trigger_on     1836.0 ms
+round 2 trigger_off    1619.8 ms
+round 3 trigger_on     1909.2 ms
+round 3 trigger_off    1659.5 ms
+round 4 trigger_on     1856.9 ms
+round 4 trigger_off    1676.3 ms
+round 5 trigger_on     1868.2 ms
+round 5 trigger_off    1633.7 ms
+round 6 trigger_on     1892.6 ms
+round 6 trigger_off    1688.5 ms
+
+10000 rows, commit every 50, median of rounds 2-6:
+  trigger_on     1868.2 ms
+  trigger_off    1659.5 ms
+  overhead        208.7 ms total, 20.9 us per row, 12.6%

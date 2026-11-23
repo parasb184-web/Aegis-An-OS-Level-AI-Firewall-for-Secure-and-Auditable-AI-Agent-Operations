@@ -1,10 +1,31 @@
-
+-- Build actions_exp: a scratch copy of the audit log with 2,000,000
+-- synthetic rows, for the index and trigger experiments.
+--
+-- Run with:
+--   psql -U aegis -d aegis -h localhost -f sql/generate_dataset.sql
+--
+-- Why a separate table and not actions itself:
+--   * actions now has the verdict_counts trigger; 2M fake rows would fire
+--     it 2M times and leave fake totals on the live dashboard.
+--   * "before indexes" means dropping indexes, which we do not want to do
+--     on the table the daemon writes to.
+--
+-- Why timestamps relative to now():
+--   The old script also used now(), but those rows have aged, so "last 10
+--   minutes" now finds nothing. Rows here span the 7 days ending at the
+--   moment this script runs (one row every 0.3024 s = 7 days / 2M), so
+--   recent-window queries return rows as long as you run them soon after.
+--   ids grow with time, like the real log.
+--
+-- No random(): every column is arithmetic on i, so re-running gives the
+-- same rows (only shifted to the new now()).
 
 \timing on
 
 DROP TABLE IF EXISTS verdict_counts_exp;
 DROP TABLE IF EXISTS actions_exp;
 
+-- Column for column the same as actions in schema.sql.
 CREATE TABLE actions_exp (
     id             SERIAL PRIMARY KEY,
     ts             TIMESTAMP NOT NULL DEFAULT now(),
@@ -17,6 +38,10 @@ CREATE TABLE actions_exp (
     parent_action  INTEGER REFERENCES actions_exp(id)
 );
 
+-- Paths and process names follow the original index_experiment.sql so the
+-- shape of the data is the same. Note the path formula only produces 1,800
+-- distinct paths (dir and file numbers must agree mod 100), about 1,111
+-- rows each. Verdicts: 5% block, 5% warn (Paras's new verdict), 90% allow.
 INSERT INTO actions_exp (ts, pid, process_name, path, operation, verdict, reason)
 SELECT
     now() - make_interval(secs => (2000000 - i) * 0.3024),
