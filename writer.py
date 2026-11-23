@@ -1,45 +1,38 @@
 import queue
 import threading
 import time
-from typing import Any, List, Optional, Tuple
 
 import db
 
-__all__ = ["record", "start", "stop", "decisions"]
+_STOP = object()
 
-_STOP: object = object()
+_thread = None
+decisions = queue.Queue()
 
-_thread: Optional[threading.Thread] = None
-decisions: "queue.Queue[Any]" = queue.Queue()
+BATCH_SIZE = 50
+FLUSH_SECONDS = 2
 
-BATCH_SIZE: int = 50         
-FLUSH_SECONDS: float = 2.0    
-RETRY_WAIT: float = 3.0       
-STOP_TIMEOUT: float = 10.0    
+RETRY_WAIT = 3
 
-DecisionRecord = Tuple[int, str, str, str, str]
+STOP_TIMEOUT = 10
 
 
-def record(pid: int, process_name: str, path: str, verdict: str, reason: str) -> None:
-    """Enqueue a security decision record for asynchronous persistence."""
+def record(pid, process_name, path, verdict, reason):
     decisions.put((pid, process_name, path, verdict, reason))
 
 
-def write_batch(cur: Any, batch: List[DecisionRecord]) -> None:
-    """Execute batch insert of decision records into PostgreSQL actions table."""
+def write_batch(cur, batch):
     for pid, process_name, path, verdict, reason in batch:
         cur.execute(
             'INSERT INTO actions (pid, process_name, path, verdict, reason) '
             'VALUES (%s, %s, %s, %s, %s)',
-            (pid, process_name, path, verdict, reason)
-        )
+            (pid, process_name, path, verdict, reason))
 
 
-def writer_loop() -> None:
-    """Worker loop that collects queued decisions and flushes in batches."""
+def writer_loop():
     conn = db.connect()
     cur = conn.cursor()
-    batch: List[DecisionRecord] = []
+    batch = []
     last_flush = time.time()
 
     while True:
@@ -116,16 +109,14 @@ def writer_loop() -> None:
                 print('[writer] ' + str(len(batch)) + ' rows held in memory, will retry next cycle.')
 
 
-def start() -> threading.Thread:
-    """Start the asynchronous audit writer background thread."""
+def start():
     global _thread
     _thread = threading.Thread(target=writer_loop, daemon=False)
     _thread.start()
     return _thread
 
 
-def stop(timeout: float = STOP_TIMEOUT) -> bool:
-    """Signal shutdown sentinel and wait for the writer thread to finish."""
+def stop(timeout=STOP_TIMEOUT):
     decisions.put(_STOP)
     if _thread is None:
         return True

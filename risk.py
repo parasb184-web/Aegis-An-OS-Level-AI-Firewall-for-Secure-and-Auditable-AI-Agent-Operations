@@ -1,28 +1,23 @@
 import os
 import time
-from typing import Dict, List, Optional, Tuple
-
-__all__ = ["record", "trim", "forget", "score", "is_warning", "is_risky"]
-
-WINDOW: float = 10.0
-
-FILE_LIMIT: int = 15      
-FOLDER_LIMIT: int = 4     
-WARN_AT: int = 30        
-BLOCK_AT: int = 40       
-
-history: Dict[int, List[Tuple[float, str]]] = {}
 
 
-def record(root: int, path: str) -> None:
-    """Record a file open event for an agent process tree."""
+WINDOW = 10.0
+FILE_LIMIT = 15
+FOLDER_LIMIT = 4
+WARN_AT = 30
+BLOCK_AT = 40
+
+history = {}
+
+
+def record(root, path):
     now = time.time()
     history.setdefault(root, []).append((now, os.path.dirname(path)))
     trim(now)
 
 
-def trim(now: float) -> None:
-    """Evict records older than the sliding window."""
+def trim(now):
     cutoff = now - WINDOW
     for root in list(history):
         opens = history[root]
@@ -32,19 +27,17 @@ def trim(now: float) -> None:
             del history[root]
 
 
-def forget(root: int) -> None:
-    """Clear all history for a terminated agent process tree."""
+def forget(root):
     history.pop(root, None)
 
 
-def score(root: int) -> Tuple[int, str]:
-    """Calculate the cumulative risk score and justification for an agent."""
+def score(root):
     opens = history.get(root, [])
     files = len(opens)
     folders = len(set(folder for when, folder in opens))
 
     points = 0
-    reasons: List[str] = []
+    reasons = []
 
     if files > FILE_LIMIT:
         points = points + 40
@@ -57,13 +50,11 @@ def score(root: int) -> Tuple[int, str]:
     return points, ", ".join(reasons)
 
 
-def is_warning(points: int) -> bool:
-    """Check if the score warrants a warning without blocking."""
+def is_warning(points):
     return WARN_AT <= points < BLOCK_AT
 
 
-def is_risky(points: int) -> bool:
-    """Check if the score exceeds the blocking threshold."""
+def is_risky(points):
     return points >= BLOCK_AT
 
 
@@ -71,8 +62,8 @@ if __name__ == "__main__":
     for i in range(30):
         p = "/home/test/notes/file%d.txt" % i
         record(1234, p)
-        pts, why = score(1234)
-        if i % 10 == 0 or is_risky(pts):
-            print("file %-3d score %-4d %s" % (i, pts, why))
-            if is_risky(pts):
+        points, why = score(1234)
+        if i % 10 == 0 or is_risky(points):
+            print("file %-3d score %-4d %s" % (i, points, why))
+            if is_risky(points):
                 break

@@ -1,72 +1,45 @@
-"""Aegis Kernel Firewall Monitoring Daemon.
-
-Uses Linux fanotify in permission mode (FAN_OPEN_PERM) to intercept file open
-events across monitored directories. Evaluates process trees against PostgreSQL
-security policies and the dynamic sliding-window risk engine before responding to
-the Linux kernel with FAN_ALLOW or FAN_DENY.
-"""
-
 import ctypes
 import json
 import os
 import signal
 import struct
 import sys
-import tempfile
 import threading
 import time
-from typing import Any, Dict, List, Optional, Set, Tuple
-
-import db
+import tempfile
 import risk
+import db
 import writer
 
-# Load Linux C library for fanotify syscalls (with fallback for static analysis on Windows)
-try:
-    libc = ctypes.CDLL("libc.so.6", use_errno=True)
-except (OSError, AttributeError):
-    libc = None
+libc = ctypes.CDLL("libc.so.6", use_errno=True)
 
-# Linux fanotify bit flags
-FAN_CLOEXEC: int        = 0x00000001  # Close-on-exec flag on new file descriptor
-FAN_CLASS_CONTENT: int  = 0x00000004  # Permission events before access; content inspection
-FAN_OPEN_PERM: int      = 0x00010000  # File open permission event (blocks until answered)
-FAN_EVENT_ON_CHILD: int = 0x08000000  # Include child directory events
-FAN_MARK_ADD: int       = 0x00000001  # Add directory to fanotify watch list
+FAN_CLOEXEC        = 0x00000001
+FAN_CLASS_CONTENT  = 0x00000004
+FAN_OPEN_PERM      = 0x00010000
+FAN_EVENT_ON_CHILD = 0x08000000
+FAN_MARK_ADD       = 0x00000001
+FAN_ALLOW          = 0x01
+FAN_DENY           = 0x02
 
-# Kernel response verdicts
-FAN_ALLOW: int          = 0x01        # Grant permission to open file
-FAN_DENY: int           = 0x02        # Deny open with EPERM
+AT_FDCWD = -100
+O_RDONLY = 0
 
-AT_FDCWD: int           = -100        # Special fd for current working directory
-O_RDONLY: int           = 0
+DEFAULT_ROOTS = "/tmp/aegis_roots"
 
-DEFAULT_ROOTS: str      = "/tmp/aegis_roots"
-SWEEP_SECONDS: float    = 1.0
-MAX_DEPTH: int          = 40
-DEFAULT_STATUS: str     = "/tmp/aegis_status.json"
+SWEEP_SECONDS = 1.0
 
-# Binary struct format for struct fanotify_event_metadata:
-# < (little endian) I (event_len) B (vers) B (reserved) H (metadata_len) Q (mask) i (fd) i (pid)
-EVENT_FORMAT: str       = "<IBBHQii"
+MAX_DEPTH = 40
 
-if libc is not None:
-    libc.fanotify_init.argtypes = [ctypes.c_uint, ctypes.c_uint]
-    libc.fanotify_mark.argtypes = [
-        ctypes.c_int,
-        ctypes.c_uint,
-        ctypes.c_uint64,
-        ctypes.c_int,
-        ctypes.c_char_p,
-    ]
+DEFAULT_STATUS = "/tmp/aegis_status.json"
+
+EVENT_FORMAT = "<IBBHQii"
+
+libc.fanotify_init.argtypes = [ctypes.c_uint, ctypes.c_uint]
+libc.fanotify_mark.argtypes = [ctypes.c_int, ctypes.c_uint, ctypes.c_uint64,
+                               ctypes.c_int, ctypes.c_char_p]
 
 
-def start_fanotify() -> int:
-    """Initialize fanotify in permission mode (requires CAP_SYS_ADMIN)."""
-    if libc is None:
-        print("fanotify requires Linux glibc (libc.so.6).")
-        sys.exit(1)
-
+def start_fanotify():
     fan_fd = libc.fanotify_init(FAN_CLOEXEC | FAN_CLASS_CONTENT, O_RDONLY)
     if fan_fd < 0:
         err = ctypes.get_errno()
@@ -79,32 +52,23 @@ def start_fanotify() -> int:
     return fan_fd
 
 
-def watch_folder(fan_fd: int, folder: str) -> None:
-    """Mark a directory path for child permission event interception."""
-    if libc is None:
-        return
-    result = libc.fanotify_mark(
-        fan_fd,
-        FAN_MARK_ADD,
-        FAN_OPEN_PERM | FAN_EVENT_ON_CHILD,
-        AT_FDCWD,
-        folder.encode(),
-    )
+def watch_folder(fan_fd, folder):
+    result = libc.fanotify_mark(fan_fd, FAN_MARK_ADD,
+                                FAN_OPEN_PERM | FAN_EVENT_ON_CHILD,
+                                AT_FDCWD, folder.encode())
     if result < 0:
         print("fanotify_mark failed:", os.strerror(ctypes.get_errno()))
         sys.exit(1)
 
 
-def path_of(fd: int) -> str:
-    """Resolve file path associated with the event file descriptor."""
+def path_of(fd):
     try:
         return os.readlink("/proc/self/fd/%d" % fd)
     except OSError:
         return "<unknown>"
 
 
-def name_of_process(pid: int) -> str:
-    """Read the executable name of a process from /proc/<pid>/comm."""
+def name_of_process(pid):
     try:
         with open("/proc/%d/comm" % pid) as f:
             return f.read().strip()
@@ -112,18 +76,17 @@ def name_of_process(pid: int) -> str:
         return "<gone>"
 
 
-status_path: Optional[str] = None
-watching: Optional[str] = None
-roots_file: Optional[str] = None
+status_path = None
+watching = None
+roots_file = None
 
-roots: Set[int] = set()
-supervised_cache: Dict[int, Optional[int]] = {}
-roots_mtime: float = -1.0
-last_sweep: float = 0.0
+roots = set()
+supervised_cache = {}
+roots_mtime = -1.0
+last_sweep = 0.0
 
 
-def parent_of(pid: int) -> int:
-    """Extract parent PID (PPID) by reading /proc/<pid>/stat."""
+def parent_of(pid):
     try:
         with open("/proc/%d/stat" % pid) as f:
             line = f.read()
@@ -138,14 +101,12 @@ def parent_of(pid: int) -> int:
     return int(fields[1])
 
 
-def alive(pid: int) -> bool:
-    """Check if process directory still exists in /proc."""
+def alive(pid):
     return os.path.exists("/proc/%d" % pid)
 
 
-def read_roots_file(path: str) -> Set[int]:
-    """Parse agent root PIDs from the shared roots registry file."""
-    found: Set[int] = set()
+def read_roots_file(path):
+    found = set()
     try:
         with open(path) as f:
             for line in f:
@@ -157,8 +118,7 @@ def read_roots_file(path: str) -> Set[int]:
     return found
 
 
-def refresh_roots(path: str) -> None:
-    """Check file modification time and reload agent roots when updated."""
+def refresh_roots(path):
     global roots_mtime
 
     try:
@@ -175,8 +135,7 @@ def refresh_roots(path: str) -> None:
             supervised_cache.clear()
 
 
-def sweep(path: str) -> None:
-    """Prune terminated root PIDs and refresh heartbeat status."""
+def sweep(path):
     global roots_mtime, last_sweep
 
     now = time.time()
@@ -194,11 +153,11 @@ def sweep(path: str) -> None:
             del supervised_cache[pid]
 
     roots_mtime = -1.0
+
     publish_status()
 
 
-def publish_status() -> None:
-    """Write daemon heartbeat and active agent status atomically to status JSON."""
+def publish_status():
     if not status_path:
         return
 
@@ -239,37 +198,31 @@ def publish_status() -> None:
         pass
 
 
-def supervising_root(pid: int) -> Optional[int]:
-    """Walk up parent chain to discover if process descends from an agent root."""
+def supervising_root(pid):
     if pid in supervised_cache:
         return supervised_cache[pid]
 
-    result = None
+    answer = None
     walk = pid
     depth = 0
     while walk > 1 and depth < MAX_DEPTH:
         if walk in roots:
-            result = walk
+            answer = walk
             break
         walk = parent_of(walk)
         depth = depth + 1
 
-    supervised_cache[pid] = result
-    return result
+    supervised_cache[pid] = answer
+    return answer
 
 
-def decide(
-    policies: List[Tuple[str, str, str, Optional[str]]],
-    path: str,
-    root: int
-) -> Tuple[int, str, str]:
-    """Evaluate target path against database policies and risk score."""
+def decide(policies, path, root):
     action, note = db.check(policies, path)
 
     risk.record(root, path)
 
     if action == "block":
-        return FAN_DENY, "block", note or "blocked by policy"
+        return FAN_DENY, "block", note
 
     points, why = risk.score(root)
 
@@ -280,23 +233,19 @@ def decide(
         return FAN_ALLOW, "warn", "risk %d: %s" % (points, why)
 
     if action == "allow":
-        return FAN_ALLOW, "allow", note or "allowed by policy"
+        return FAN_ALLOW, "allow", note
 
     return FAN_ALLOW, "allow", "no rule"
 
-
-def on_signal(signum: int, frame: Any) -> None:
-    """Handle termination signals cleanly."""
+def on_signal(signum, frame):
     raise KeyboardInterrupt
 
 
-def answer(fan_fd: int, event_fd: int, verdict: int) -> None:
-    """Respond to Linux fanotify kernel with permission verdict struct."""
+def answer(fan_fd, event_fd, verdict):
     os.write(fan_fd, struct.pack("<iI", event_fd, verdict))
 
 
-def main() -> None:
-    """Main fanotify event loop."""
+def main():
     if len(sys.argv) < 2:
         print("usage: sudo python3 daemon.py <folder> [--roots <file>]")
         sys.exit(1)
@@ -308,11 +257,9 @@ def main() -> None:
     rest = sys.argv[2:]
     while rest:
         if rest[0] == "--roots" and len(rest) > 1:
-            roots_path = rest[1]
-            rest = rest[2:]
+            roots_path = rest[1]; rest = rest[2:]
         elif rest[0] == "--status" and len(rest) > 1:
-            status = rest[1]
-            rest = rest[2:]
+            status = rest[1]; rest = rest[2:]
         else:
             print("usage: sudo python3 daemon.py <folder> "
                   "[--roots <file>] [--status <file>]")
@@ -339,12 +286,14 @@ def main() -> None:
     roots_file = roots_path
     publish_status()
 
-    def heartbeat_worker() -> None:
-        while True:
-            time.sleep(1.0)
+    stop_beat = threading.Event()
+
+    def heartbeat():
+        while not stop_beat.wait(1.0):
             publish_status()
 
-    threading.Thread(target=heartbeat_worker, daemon=True).start()
+    beat = threading.Thread(target=heartbeat, daemon=True)
+    beat.start()
 
     signal.signal(signal.SIGINT, on_signal)
     signal.signal(signal.SIGTERM, on_signal)
@@ -397,6 +346,9 @@ def main() -> None:
 
     except KeyboardInterrupt:
         pass
+
+    stop_beat.set()
+    beat.join()
 
     try:
         os.remove(status_path)

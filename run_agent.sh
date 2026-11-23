@@ -4,7 +4,7 @@ set -e
 ROOTS=${AEGIS_ROOTS:-/tmp/aegis_roots}
 
 if [ $# -ne 1 ]; then
-    echo "usage: ./run_agent.sh [normal|credentials|massread]"
+    echo "usage: ./run_agent.sh [normal|credentials|massread|wander]"
     exit 1
 fi
 
