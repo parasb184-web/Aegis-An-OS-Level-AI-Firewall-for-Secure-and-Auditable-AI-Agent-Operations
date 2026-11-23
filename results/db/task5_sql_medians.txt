@@ -1,0 +1,11 @@
+label                   median_ms     min_ms     max_ms  top plan node
+live_trigger_on           787.902    775.697    812.456  Insert on actions
+                       runs 2-6: 787.902, 812.456, 802.922, 783.207, 775.697
+                       of which trigger, median: 721.718 ms
+live_trigger_off           59.063     52.436     69.221  Insert on actions
+                       runs 2-6: 62.617, 52.525, 69.221, 59.063, 52.436
+exp_trigger_on            818.346    747.838    841.648  Insert on actions_exp
+                       runs 2-6: 818.346, 841.648, 832.312, 778.395, 747.838
+                       of which trigger, median: 732.364 ms
+exp_trigger_off            72.422     60.194     81.914  Insert on actions_exp
+                       runs 2-6: 81.914, 71.270, 72.422, 72.521, 60.194
