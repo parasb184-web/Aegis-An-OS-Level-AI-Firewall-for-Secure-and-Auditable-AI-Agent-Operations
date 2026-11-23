@@ -12,10 +12,7 @@ import db
 
 app = FastAPI()
 
-# ---------------------------------------------------------------------------
-# Configuration constants
-# ---------------------------------------------------------------------------
-SCENARIOS = ("normal", "credentials", "massread")
+SCENARIOS = ("normal", "credentials", "massread", "wander")
 
 ROOTS_FILE = os.environ.get("AEGIS_ROOTS", "/tmp/aegis_roots")
 
@@ -29,9 +26,6 @@ _running = None
 _running_lock = threading.Lock()
 
 
-# ---------------------------------------------------------------------------
-# Dashboard and telemetry routes
-# ---------------------------------------------------------------------------
 @app.get("/counts")
 def counts():
     with cursor() as cur:
@@ -93,9 +87,6 @@ def run(scenario: str):
     return {"started": True, "scenario": scenario, "pid": proc.pid}
 
 
-# ---------------------------------------------------------------------------
-# Helper utilities
-# ---------------------------------------------------------------------------
 @contextlib.contextmanager
 def cursor():
     conn = db.connect()
@@ -167,7 +158,9 @@ def sessions():
 
         out = []
         for (pid, proc, lo, hi, n, a, w, b, ssh, notes, unsup) in cur.fetchall():
-            if notes:
+            if notes and w and not b:
+                scenario = "wander"
+            elif notes:
                 scenario = "massread"
             elif ssh:
                 scenario = "credentials"

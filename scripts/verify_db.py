@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""Aegis Database Health Check.
-
-Verifies PostgreSQL connectivity, schema tables, triggers, and current decision
-record counts.
-"""
 
 import sys
 import os
@@ -19,13 +14,12 @@ def main():
         conn = db.connect()
     except Exception as e:
         print(f"[Error] Failed to connect: {e}")
-        print("Ensure PostgreSQL is running and credentials in db.py / AEGIS_DB are valid.")
+        print("Ensure PostgreSQL is running and the settings in db.py are correct.")
         sys.exit(1)
 
     cur = conn.cursor()
     print("[Aegis DB Check] Connected successfully.")
 
-    # 1. Verify tables
     expected_tables = ["policies", "actions", "verdict_counts"]
     cur.execute("""
         SELECT table_name 
@@ -42,7 +36,6 @@ def main():
             print(f"  [MISSING] Table '{t}' not found! Run: psql -d aegis -f schema.sql")
             all_ok = False
 
-    # 2. Verify trigger
     cur.execute("""
         SELECT trigger_name 
         FROM information_schema.triggers 
@@ -54,7 +47,6 @@ def main():
     else:
         print("  [WARN] Trigger 'actions_count_verdict' missing from actions table.")
 
-    # 3. Report record counts
     if "policies" in existing_tables:
         cur.execute("SELECT count(*) FROM policies")
         print(f"  Policies configured: {cur.fetchone()[0]}")

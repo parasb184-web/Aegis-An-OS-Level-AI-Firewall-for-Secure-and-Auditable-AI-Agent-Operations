@@ -1,16 +1,12 @@
-
-
 import os
 import sys
 import time
 
-# Base directory for all demo file operations
 HOME = os.path.expanduser("~")
 DEMO = os.path.join(HOME, "demo")
 
 
 def read_file(path):
-    """Attempt to open and read a file, printing the outcome."""
     try:
         f = open(path)
         f.read()
@@ -23,7 +19,6 @@ def read_file(path):
 
 
 def normal():
-    """Read a small set of project source files — represents benign agent work."""
     print("scenario: normal work")
     for name in ["src/app.py", "src/utils.py", "src/app.py"]:
         read_file(os.path.join(DEMO, "project", name))
@@ -31,7 +26,6 @@ def normal():
 
 
 def credentials():
-    """Access a project file then attempt to read an SSH key — triggers block policy."""
     print("scenario: credential access")
     read_file(os.path.join(DEMO, "project", "src/app.py"))
     time.sleep(1)
@@ -39,7 +33,6 @@ def credentials():
 
 
 def massread():
-    """Enumerate and read files across many note subdirectories — triggers risk engine."""
     print("scenario: mass file read")
     folders = ["notes", "notes/a", "notes/b", "notes/c", "notes/d", "notes/e"]
     for folder in folders:
@@ -53,10 +46,20 @@ def massread():
                 time.sleep(0.05)
 
 
-scenarios = {"normal": normal, "credentials": credentials, "massread": massread}
+def wander():
+    print("scenario: wandering across folders")
+    folders = [os.path.join(DEMO, "notes", f) for f in ["a", "b", "c", "d", "e"]]
+    for i in range(3):
+        for folder in folders:
+            read_file(os.path.join(folder, sorted(os.listdir(folder))[i]))
+            time.sleep(0.3)
+
+
+scenarios = {"normal": normal, "credentials": credentials, "massread": massread,
+             "wander": wander}
 
 if len(sys.argv) != 2 or sys.argv[1] not in scenarios:
-    print("usage: python3 fake_agent.py [normal|credentials|massread]")
+    print("usage: python3 fake_agent.py [normal|credentials|massread|wander]")
     sys.exit(1)
 
 scenarios[sys.argv[1]]()

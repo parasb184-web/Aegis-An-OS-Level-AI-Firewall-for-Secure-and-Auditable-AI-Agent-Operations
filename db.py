@@ -1,8 +1,6 @@
 import fnmatch
 import psycopg2
 
-__all__ = ["connect", "load_policies", "check"]
-
 DB = "dbname=aegis user=aegis password=aegis host=localhost"
 
 
